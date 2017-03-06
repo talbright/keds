@@ -1,0 +1,4 @@
+package: github.com/talbright/keds
+import:
+- package: github.com/hashicorp/go-plugin
+- package: github.com/hashicorp/yamux

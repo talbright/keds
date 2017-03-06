@@ -1,0 +1,8 @@
+hash: 4da6e9d31ffb5b0c2c7f887899c89775a16b7bb4fbe2b7017a966235f9719de9
+updated: 2017-03-05T18:22:07.401764875-05:00
+imports:
+- name: github.com/hashicorp/go-plugin
+  version: f72692aebca2008343a9deb06ddb4b17f7051c15
+- name: github.com/hashicorp/yamux
+  version: d1caa6c97c9fc1cc9e83bbe34d0603f9ff0ce8bd
+testImports: []
