@@ -22,7 +22,7 @@ _testmain.go
 *.test
 *.exe
 *.prof
-birdhouse
+keds
 main
 
 vendor
