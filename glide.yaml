@@ -1,9 +1,0 @@
-package: github.com/talbright/keds
-import:
-- package: github.com/spf13/viper
-- package: github.com/spf13/cobra
-- package: github.com/gosuri/cmdns
-- package: github.com/go-swagger/go-swagger
-  version: ^0.8.0
-  subpackages:
-  - cmd/swagger

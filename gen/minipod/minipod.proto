@@ -1,0 +1,15 @@
+//$ protoc -I minipod/ minipod/minipod.proto --go_out=plugins=grpc:minipod
+syntax = "proto3";
+
+package minipod;
+
+service MinipodService {
+  rpc Create (Minipod) returns (Minipod) {}
+}
+
+message Minipod {
+	int64 id = 1;
+	string name = 2;
+	string status = 3;
+}
+

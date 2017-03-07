@@ -20,9 +20,7 @@ keds: main.go
 
 build: glide-install compile
 
-test-ci: tools test
-
-test: build validate godo-test-prepare
+test: build validate
 	go test -p 1 -v -race $(PACKAGES)
 
 vet:
@@ -42,15 +40,14 @@ $(GOLINT):
 $(GOTOOLS):
 	go install ./vendor/$@
 
-tools: $(GOTOOLS) godo-rebuild
+tools: $(GOTOOLS)
+
+gen-minipod:
+	cd gen && protoc -I minipod/ minipod/minipod.proto --go_out=plugins=grpc:minipod
+
+gen: gen-minipod
 
 validate: fmt vet
-
-godo-rebuild: $(GODO)
-	godo --rebuild
-
-godo-test-prepare: godo-rebuild
-	BIRDHOUSE_ENV=test godo db:testPrepare
 
 test-%: PCKG = ./$*/...
 test-%: PCKG_DIR = ./$*
@@ -72,7 +69,7 @@ run:
 clean-logs:
 	-rm *.log
 
-clean: clean-logs clean-zk
+clean: clean-logs
 	-rm -f ./main
 	-rm -f ./keds
 	-rm -f $(GOPATH)/bin/keds
