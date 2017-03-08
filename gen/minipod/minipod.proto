@@ -1,10 +1,17 @@
 //$ protoc -I minipod/ minipod/minipod.proto --go_out=plugins=grpc:minipod
 syntax = "proto3";
 
+import "google/api/annotations.proto";
+
 package minipod;
 
 service MinipodService {
-  rpc ProvisionMinipod (ProvisionMinipodRequest) returns (ProvisionMinipodResponse) {}
+	rpc ProvisionMinipod (ProvisionMinipodRequest) returns (ProvisionMinipodResponse) {
+		option (google.api.http) = {
+				post: "/v1/minipod"
+				body: "*"
+		};
+	}
 }
 
 message ProvisionMinipodRequest {
@@ -12,6 +19,6 @@ message ProvisionMinipodRequest {
 }
 
 message ProvisionMinipodResponse {
-	int64 id = 1;
+	uint32 id = 1;
 }
 

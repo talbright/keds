@@ -42,8 +42,33 @@ $(GOTOOLS):
 
 tools: $(GOTOOLS)
 
-gen-minipod:
-	cd gen && protoc -I minipod/ minipod/minipod.proto --go_out=plugins=grpc:minipod
+gen-minipod: gen-minipod-grpc gen-minipod-reverse-proxy gen-minpod-swagger
+
+gen-minipod-grpc:
+	cd gen && protoc \
+		-I minipod/ \
+		-I $(GOPATH)/src \
+		-I $(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+		--go_out=Mgoogle/api/annotations.proto=github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api,plugins=grpc:minipod \
+		minipod/minipod.proto
+
+gen-minipod-reverse-proxy:
+	cd gen && protoc \
+		-I /usr/local/include \
+		-I. \
+		-I $(GOPATH)/src \
+		-I $(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+		--grpc-gateway_out=logtostderr=true:. \
+		minipod/minipod.proto
+
+gen-minipod-swagger:
+	cd gen && protoc \
+		-I /usr/local/include \
+		-I. \
+		-I $(GOPATH)/src \
+		-I $(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+		--swagger_out=logtostderr=true:. \
+		minipod/minipod.proto
 
 minipod-server:
 	cd minipod/server && go run main.go
