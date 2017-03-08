@@ -45,6 +45,12 @@ tools: $(GOTOOLS)
 gen-minipod:
 	cd gen && protoc -I minipod/ minipod/minipod.proto --go_out=plugins=grpc:minipod
 
+minipod-server:
+	cd minipod/server && go run main.go
+
+minipod-client:
+	cd minipod/client && go run main.go
+
 gen: gen-minipod
 
 validate: fmt vet

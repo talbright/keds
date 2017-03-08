@@ -17,8 +17,8 @@ const (
 // server implements minipod.MinipodServiceServer
 type server struct{}
 
-func (s *server) Create(ctx context.Context, mp *Minipod) (*Minipod, error) {
-	return &Minipod{Id: 1, Status: "new", Name: mp.GetName()}, nil
+func (s *server) ProvisionMinipod(ctx context.Context, mp *ProvisionMinipodRequest) (*ProvisionMinipodResponse, error) {
+	return &ProvisionMinipodResponse{Id: 1}, nil
 }
 
 func main() {

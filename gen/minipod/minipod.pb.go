@@ -9,7 +9,8 @@ It is generated from these files:
 	minipod.proto
 
 It has these top-level messages:
-	Minipod
+	ProvisionMinipodRequest
+	ProvisionMinipodResponse
 */
 package minipod
 
@@ -33,40 +34,41 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type Minipod struct {
-	Id     int64  `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
-	Name   string `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
-	Status string `protobuf:"bytes,3,opt,name=status" json:"status,omitempty"`
+type ProvisionMinipodRequest struct {
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 }
 
-func (m *Minipod) Reset()                    { *m = Minipod{} }
-func (m *Minipod) String() string            { return proto.CompactTextString(m) }
-func (*Minipod) ProtoMessage()               {}
-func (*Minipod) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (m *ProvisionMinipodRequest) Reset()                    { *m = ProvisionMinipodRequest{} }
+func (m *ProvisionMinipodRequest) String() string            { return proto.CompactTextString(m) }
+func (*ProvisionMinipodRequest) ProtoMessage()               {}
+func (*ProvisionMinipodRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-func (m *Minipod) GetId() int64 {
-	if m != nil {
-		return m.Id
-	}
-	return 0
-}
-
-func (m *Minipod) GetName() string {
+func (m *ProvisionMinipodRequest) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-func (m *Minipod) GetStatus() string {
+type ProvisionMinipodResponse struct {
+	Id int64 `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
+}
+
+func (m *ProvisionMinipodResponse) Reset()                    { *m = ProvisionMinipodResponse{} }
+func (m *ProvisionMinipodResponse) String() string            { return proto.CompactTextString(m) }
+func (*ProvisionMinipodResponse) ProtoMessage()               {}
+func (*ProvisionMinipodResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+
+func (m *ProvisionMinipodResponse) GetId() int64 {
 	if m != nil {
-		return m.Status
+		return m.Id
 	}
-	return ""
+	return 0
 }
 
 func init() {
-	proto.RegisterType((*Minipod)(nil), "minipod.Minipod")
+	proto.RegisterType((*ProvisionMinipodRequest)(nil), "minipod.ProvisionMinipodRequest")
+	proto.RegisterType((*ProvisionMinipodResponse)(nil), "minipod.ProvisionMinipodResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -80,7 +82,7 @@ const _ = grpc.SupportPackageIsVersion4
 // Client API for MinipodService service
 
 type MinipodServiceClient interface {
-	Create(ctx context.Context, in *Minipod, opts ...grpc.CallOption) (*Minipod, error)
+	ProvisionMinipod(ctx context.Context, in *ProvisionMinipodRequest, opts ...grpc.CallOption) (*ProvisionMinipodResponse, error)
 }
 
 type minipodServiceClient struct {
@@ -91,9 +93,9 @@ func NewMinipodServiceClient(cc *grpc.ClientConn) MinipodServiceClient {
 	return &minipodServiceClient{cc}
 }
 
-func (c *minipodServiceClient) Create(ctx context.Context, in *Minipod, opts ...grpc.CallOption) (*Minipod, error) {
-	out := new(Minipod)
-	err := grpc.Invoke(ctx, "/minipod.MinipodService/Create", in, out, c.cc, opts...)
+func (c *minipodServiceClient) ProvisionMinipod(ctx context.Context, in *ProvisionMinipodRequest, opts ...grpc.CallOption) (*ProvisionMinipodResponse, error) {
+	out := new(ProvisionMinipodResponse)
+	err := grpc.Invoke(ctx, "/minipod.MinipodService/ProvisionMinipod", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -103,27 +105,27 @@ func (c *minipodServiceClient) Create(ctx context.Context, in *Minipod, opts ...
 // Server API for MinipodService service
 
 type MinipodServiceServer interface {
-	Create(context.Context, *Minipod) (*Minipod, error)
+	ProvisionMinipod(context.Context, *ProvisionMinipodRequest) (*ProvisionMinipodResponse, error)
 }
 
 func RegisterMinipodServiceServer(s *grpc.Server, srv MinipodServiceServer) {
 	s.RegisterService(&_MinipodService_serviceDesc, srv)
 }
 
-func _MinipodService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Minipod)
+func _MinipodService_ProvisionMinipod_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ProvisionMinipodRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MinipodServiceServer).Create(ctx, in)
+		return srv.(MinipodServiceServer).ProvisionMinipod(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/minipod.MinipodService/Create",
+		FullMethod: "/minipod.MinipodService/ProvisionMinipod",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MinipodServiceServer).Create(ctx, req.(*Minipod))
+		return srv.(MinipodServiceServer).ProvisionMinipod(ctx, req.(*ProvisionMinipodRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -133,8 +135,8 @@ var _MinipodService_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*MinipodServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Create",
-			Handler:    _MinipodService_Create_Handler,
+			MethodName: "ProvisionMinipod",
+			Handler:    _MinipodService_ProvisionMinipod_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -144,14 +146,15 @@ var _MinipodService_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("minipod.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 138 bytes of a gzipped FileDescriptorProto
+	// 148 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0xcd, 0xcd, 0xcc, 0xcb,
-	0x2c, 0xc8, 0x4f, 0xd1, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x87, 0x72, 0x95, 0x5c, 0xb9,
-	0xd8, 0x7d, 0x21, 0x4c, 0x21, 0x3e, 0x2e, 0xa6, 0xcc, 0x14, 0x09, 0x46, 0x05, 0x46, 0x0d, 0xe6,
-	0x20, 0xa6, 0xcc, 0x14, 0x21, 0x21, 0x2e, 0x96, 0xbc, 0xc4, 0xdc, 0x54, 0x09, 0x26, 0x05, 0x46,
-	0x0d, 0xce, 0x20, 0x30, 0x5b, 0x48, 0x8c, 0x8b, 0xad, 0xb8, 0x24, 0xb1, 0xa4, 0xb4, 0x58, 0x82,
-	0x19, 0x2c, 0x0a, 0xe5, 0x19, 0x39, 0x70, 0xf1, 0x41, 0x8d, 0x09, 0x4e, 0x2d, 0x2a, 0xcb, 0x4c,
-	0x4e, 0x15, 0xd2, 0xe3, 0x62, 0x73, 0x2e, 0x4a, 0x4d, 0x2c, 0x49, 0x15, 0x12, 0xd0, 0x83, 0xd9,
-	0x0d, 0x55, 0x22, 0x85, 0x21, 0xa2, 0xc4, 0x90, 0xc4, 0x06, 0x76, 0x98, 0x31, 0x20, 0x00, 0x00,
-	0xff, 0xff, 0x01, 0xec, 0xc8, 0xdf, 0xa9, 0x00, 0x00, 0x00,
+	0x2c, 0xc8, 0x4f, 0xd1, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x87, 0x72, 0x95, 0x74, 0xb9,
+	0xc4, 0x03, 0x8a, 0xf2, 0xcb, 0x32, 0x8b, 0x33, 0xf3, 0xf3, 0x7c, 0x21, 0x62, 0x41, 0xa9, 0x85,
+	0xa5, 0xa9, 0xc5, 0x25, 0x42, 0x42, 0x5c, 0x2c, 0x79, 0x89, 0xb9, 0xa9, 0x12, 0x8c, 0x0a, 0x8c,
+	0x1a, 0x9c, 0x41, 0x60, 0xb6, 0x92, 0x16, 0x97, 0x04, 0xa6, 0xf2, 0xe2, 0x82, 0xfc, 0xbc, 0xe2,
+	0x54, 0x21, 0x3e, 0x2e, 0xa6, 0xcc, 0x14, 0xb0, 0x6a, 0xe6, 0x20, 0xa6, 0xcc, 0x14, 0xa3, 0x6c,
+	0x2e, 0x3e, 0xa8, 0x92, 0xe0, 0xd4, 0xa2, 0xb2, 0xcc, 0xe4, 0x54, 0xa1, 0x48, 0x2e, 0x01, 0x74,
+	0xdd, 0x42, 0x0a, 0x7a, 0x30, 0x97, 0xe1, 0x70, 0x87, 0x94, 0x22, 0x1e, 0x15, 0x10, 0xab, 0x95,
+	0x18, 0x92, 0xd8, 0xc0, 0xfe, 0x32, 0x06, 0x04, 0x00, 0x00, 0xff, 0xff, 0x6c, 0x6c, 0x7f, 0x19,
+	0xe8, 0x00, 0x00, 0x00,
 }

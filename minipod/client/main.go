@@ -23,7 +23,7 @@ func main() {
 
 	//invoke client
 	c := NewMinipodServiceClient(conn)
-	r, err := c.Create(context.Background(), &Minipod{Name: "myname"})
+	r, err := c.ProvisionMinipod(context.Background(), &ProvisionMinipodRequest{Name: "myname"})
 	if err != nil {
 		log.Fatalf("request error: %v", err)
 	}
