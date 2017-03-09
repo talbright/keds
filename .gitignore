@@ -32,10 +32,4 @@ vendor
 coverage.html
 *.log
 tmp
-extras/docker/data/graphite
-extras/docker/data/zookeeper
-extras/docker/data/graylog-elasticsearch
-extras/docker/data/graylog-mongo
-extras/docker/data/graylog/journal
-extras/docker/data/graylog/config/node-id
-extras/docker/.env
+plugin/example/example

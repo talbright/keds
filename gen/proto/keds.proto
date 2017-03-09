@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+
+package proto;
+
+service KedsService {
+	rpc RegisterPlugin (RegisterPluginRequest) returns (RegisterPluginResponse) {}
+	rpc ConsoleWriter (stream ConsoleWriteRequest) returns (ConsoleWriteResponse) {}
+  rpc EventBus(stream PluginEvent) returns (stream PluginEvent) {}
+}
+
+message PluginDescriptor {
+	string name = 1;
+  string usage = 2;
+	string event_filter = 3;
+  string version = 4;
+  string root_command = 5;
+}
+
+message PluginEvent {
+	string name = 1;
+  string source = 2;
+  map<string, string> data = 3;
+}
+
+message RegisterPluginRequest {
+  PluginDescriptor plugin_descriptor = 1;
+	repeated PluginEvent register_events = 2;
+}
+
+message RegisterPluginResponse {
+	string signature = 1;
+}
+
+message ConsoleWriteRequest {
+	string signature = 1;
+	string data = 2;
+}
+
+message ConsoleWriteResponse { }
