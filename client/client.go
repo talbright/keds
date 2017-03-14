@@ -70,7 +70,7 @@ func (c *PluginClient) register() (err error) {
 		PluginDescriptor: c.PluginDescriptor,
 	}
 	var header metadata.MD
-	if _, err := c.RegisterPlugin(
+	if _, err = c.RegisterPlugin(
 		context.Background(),
 		registerPluginRequest,
 		grpc.Header(&header)); err == nil {

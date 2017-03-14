@@ -1,12 +1,13 @@
 package main
 
 import (
-	"fmt"
+	_ "fmt"
 	"io"
 	"log"
 
 	pc "github.com/talbright/keds/client"
 	pb "github.com/talbright/keds/gen/proto"
+	ut "github.com/talbright/keds/utils/token"
 
 	"golang.org/x/net/context"
 )
@@ -17,10 +18,11 @@ const (
 
 func main() {
 	descriptor := &pb.PluginDescriptor{
-		Name:        "core",
-		Usage:       "tbd",
+		Name:        "example",
+		Usage:       "<TODO>",
 		EventFilter: "*",
 		Version:     "1",
+		RootCommand: "example",
 	}
 	client := pc.NewPluginClient(descriptor)
 	if err := client.Connect(address); err != nil {
@@ -44,7 +46,8 @@ func NewExamplePlugin(descriptor *pb.PluginDescriptor, client *pc.PluginClient) 
 }
 
 func (p *ExamplePlugin) Run() (err error) {
-	stream, err := p.client.EventBus(context.Background())
+	ctx := ut.AddTokenToContext(context.Background(), p.client.Token)
+	stream, err := p.client.EventBus(ctx)
 	if err != nil {
 		log.Fatalf("event bus error: %v", err)
 	}
@@ -64,19 +67,6 @@ func (p *ExamplePlugin) Run() (err error) {
 				log.Printf("stream recv error: %v", err)
 				close(waitc)
 				return
-			}
-		}
-	}()
-	//send
-	go func() {
-		for i := 0; i < 3; i++ {
-			e := &pb.PluginEvent{
-				Name:   fmt.Sprintf("plugin:example:event%d", i),
-				Source: "plugin:example",
-			}
-			log.Printf("sending event: %v", e)
-			if err := stream.Send(e); err != nil {
-				log.Printf("error sending event: %v", err)
 			}
 		}
 	}()
