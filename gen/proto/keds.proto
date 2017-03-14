@@ -26,16 +26,13 @@ message PluginEvent {
 
 message RegisterPluginRequest {
   PluginDescriptor plugin_descriptor = 1;
-	repeated PluginEvent register_events = 2;
 }
 
 message RegisterPluginResponse {
-	string signature = 1;
 }
 
 message ConsoleWriteRequest {
-	string signature = 1;
-	string data = 2;
+	string data = 1;
 }
 
 message ConsoleWriteResponse { }

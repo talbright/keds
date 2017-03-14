@@ -25,9 +25,8 @@ func main() {
 	client := pc.NewPluginClient(descriptor)
 	if err := client.Connect(address); err != nil {
 		log.Fatalf("connect error: %v", err)
-	} else {
-		defer client.Close()
 	}
+	defer client.Close()
 	examplePlugin := NewExamplePlugin(descriptor, client)
 	examplePlugin.Run()
 }
@@ -49,6 +48,7 @@ func (p *ExamplePlugin) Run() (err error) {
 	if err != nil {
 		log.Fatalf("event bus error: %v", err)
 	}
+	p.client.Printf("client connected to bus")
 	waitc := make(chan struct{})
 	//receive
 	go func() {

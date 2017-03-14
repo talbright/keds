@@ -9,9 +9,11 @@ import (
 
 	pb "github.com/talbright/keds/gen/proto"
 	. "github.com/talbright/keds/plugin"
+	ut "github.com/talbright/keds/utils/token"
 	"golang.org/x/net/context"
-	"golang.org/x/net/trace"
+	_ "golang.org/x/net/trace"
 	"google.golang.org/grpc"
+	_ "google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -31,10 +33,11 @@ type KedsRPCServer struct {
 //RegisterPlugin gRPC interface method implementation
 //plugins must be registered first before invoking other methods
 func (s *KedsRPCServer) RegisterPlugin(ctx context.Context, req *pb.RegisterPluginRequest) (*pb.RegisterPluginResponse, error) {
-	trace.FromContext(ctx)
+	// trace.FromContext(ctx)
 	plugin := NewPluginFromRegisterPluginRequest(req)
 	err := s.Plugins.RegisterPlugin(ctx, plugin)
-	return &pb.RegisterPluginResponse{Signature: plugin.GetSha1()}, err
+	ut.AddTokenToHeader(ctx, plugin.GetSha1())
+	return &pb.RegisterPluginResponse{}, err
 }
 
 //ConsolWriter gRPC interface method implmentation
@@ -42,7 +45,7 @@ func (s *KedsRPCServer) RegisterPlugin(ctx context.Context, req *pb.RegisterPlug
 func (s *KedsRPCServer) ConsoleWriter(stream pb.KedsService_ConsoleWriterServer) error {
 	for {
 		if output, err := stream.Recv(); err == nil {
-			log.Printf("[%s] %s", output.GetSignature(), output.GetData())
+			log.Printf("%s", output.GetData())
 		} else if err == io.EOF {
 			return stream.SendAndClose(&pb.ConsoleWriteResponse{})
 		} else {
