@@ -1,3 +1,5 @@
+PACKAGES=./utils/config ./utils/token
+
 keds:
 	go build -a -o keds main.go
 
@@ -5,6 +7,9 @@ plugins: plugin-main
 
 plugin-main: plugin/example/main.go
 	go build -a -o plugin/example/example plugin/example/*.go
+
+test: keds
+	go test -p 1 -v -race $(PACKAGES)
 
 gen: gen-grpc gen-grpc-reverse-proxy gen-grpc-swagger
 

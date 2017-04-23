@@ -76,13 +76,14 @@ func AbsPathify(inPath string) string {
 	return ""
 }
 
-func UserHomeDir() string {
+func UserHomeDir() (home string) {
 	if runtime.GOOS == "windows" {
-		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		home = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
 		if home == "" {
 			home = os.Getenv("USERPROFILE")
 		}
-		return home
+	} else {
+		home = os.Getenv("HOME")
 	}
-	return os.Getenv("HOME")
+	return
 }

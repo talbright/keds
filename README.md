@@ -1,3 +1,7 @@
+# Keds
+
+A prototype for a generic and opinionated CLI plugin framework.
+
 # Running
 
 		$ go run main.go
@@ -11,23 +15,25 @@
 # TODO
 
 1. Configuration management
-  - [x] setup for viper
+	- [x] setup for viper
 	- [x] config for plugin path
 2. Plugin lifecycle management
 	- [ ] server loads plugins
 	- [x] plugin registers itself with the server
 	- [ ] plugins detect server disconnect and exit
+3. Misc
+	- [ ]
 4. Testing framework
-	- [ ] add ginko
+	- [x] add ginko test package
 	- [ ] tests for client package
 	- [ ] tests for plugin package
 	- [ ] tests for server package
-	- [ ] tests for utils package
-3. Command line
-  - [ ] pass args from server to plugins
-4. Versioning
-  - [ ] semantic version for server/host
+	- [x] tests for utils package
+5. Command line
+	- [ ] pass args from server to plugins
+6. Versioning
+	- [ ] semantic version for server/host
 	- [ ] semantic version for plugin
-5. Autopatching
+7. Autopatching
 	- https://github.com/docker/Notary
 	- https://godoc.org/github.com/inconshreveable/go-update
