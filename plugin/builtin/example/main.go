@@ -51,7 +51,7 @@ func (p *ExamplePlugin) Run() (err error) {
 	if err != nil {
 		log.Fatalf("event bus error: %v", err)
 	}
-	p.client.Printf("client connected to bus")
+	p.client.Printf("example plugin connected to console")
 	waitc := make(chan struct{})
 	//receive
 	go func() {

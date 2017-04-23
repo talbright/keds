@@ -1,15 +1,18 @@
-PACKAGES=./utils/config ./utils/token
+PACKAGES=./utils/config ./utils/token ./server
 
-keds:
+keds: gen
 	go build -a -o keds main.go
 
-plugins: plugin-main
+plugins: keds example-plugin
 
-plugin-main: plugin/example/main.go
-	go build -a -o plugin/example/example plugin/example/*.go
+example-plugin: plugin/builtin/example/main.go
+	go build -a -o plugin/builtin/example/example plugin/builtin/example/*.go
 
 test: keds
 	go test -p 1 -v -race $(PACKAGES)
+
+ginkgo-watch:
+	ginkgo watch -r $(PACKAGES)
 
 gen: gen-grpc gen-grpc-reverse-proxy gen-grpc-swagger
 
@@ -28,7 +31,7 @@ gen-grpc-reverse-proxy: gen-grpc
 		-I $(GOPATH)/src \
 		-I $(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--grpc-gateway_out=logtostderr=true:. \
-		gen/proto/keds.proto
+		proto/keds.proto
 
 gen-grpc-swagger: gen-grpc
 	cd gen && protoc \
@@ -37,7 +40,7 @@ gen-grpc-swagger: gen-grpc
 		-I $(GOPATH)/src \
 		-I $(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--swagger_out=logtostderr=true:. \
-		gen/proto/keds.proto
+		proto/keds.proto
 
 .PHONY: keds
 

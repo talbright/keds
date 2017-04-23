@@ -7,14 +7,13 @@ import (
 	"net"
 	"runtime"
 
+	"github.com/spf13/viper"
 	pb "github.com/talbright/keds/gen/proto"
 	. "github.com/talbright/keds/plugin"
 	ut "github.com/talbright/keds/utils/token"
 	"golang.org/x/net/context"
 	"golang.org/x/net/trace"
-	_ "golang.org/x/net/trace"
 	"google.golang.org/grpc"
-	_ "google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -29,6 +28,7 @@ type KedsRPCServer struct {
 	server *grpc.Server
 	events trace.EventLog
 	bus    IEventBusAdapter
+	loader ILoader
 }
 
 func NewKedsRPCServer() *KedsRPCServer {
@@ -36,6 +36,7 @@ func NewKedsRPCServer() *KedsRPCServer {
 	return &KedsRPCServer{
 		server: grpc.NewServer(),
 		bus:    NewEventBus(),
+		loader: NewLoader(viper.GetStringSlice("plugin_path")),
 		events: trace.NewEventLog("server.KedsRPCServer", fmt.Sprintf("%s:%d", file, line)),
 	}
 }
@@ -47,7 +48,7 @@ func (s *KedsRPCServer) RegisterPlugin(ctx context.Context, req *pb.RegisterPlug
 	if err = DefaultRegistry().RegisterPlugin(ut.AddTokenToContext(ctx, plugin.GetSha1()), plugin); err != nil {
 		s.events.Errorf("failed to register plugin: %v", err)
 	} else {
-		s.events.Printf("registered plugin '%s' (%s)", plugin.Name, plugin.GetSha1())
+		s.events.Printf("registered %s", plugin)
 		ut.AddTokenToHeader(ctx, plugin.GetSha1())
 	}
 	return &pb.RegisterPluginResponse{}, err
@@ -97,6 +98,8 @@ func (s *KedsRPCServer) validateToken(ctx context.Context) (err error) {
 
 func (s *KedsRPCServer) Start() {
 	go StartDebugServer()
+	log.Printf("starting plugins")
+	s.loader.Load()
 	log.Printf("starting rpc server on %s", gRPCEndPoint)
 	lis, err := net.Listen("tcp", gRPCPort)
 	if err != nil {

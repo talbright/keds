@@ -5,7 +5,6 @@ A prototype for a generic and opinionated CLI plugin framework.
 # Running
 
 		$ go run main.go
-		$ cd plugin/example && go run main.go
 
 # Debugging
 
@@ -18,11 +17,11 @@ A prototype for a generic and opinionated CLI plugin framework.
 	- [x] setup for viper
 	- [x] config for plugin path
 2. Plugin lifecycle management
-	- [ ] server loads plugins
+	- [x] server loads plugins
 	- [x] plugin registers itself with the server
-	- [ ] plugins detect server disconnect and exit
+	- [x] plugin exits when server exits
 3. Misc
-	- [ ]
+	- [ ] add ci setup for github project
 4. Testing framework
 	- [x] add ginko test package
 	- [ ] tests for client package
@@ -35,5 +34,5 @@ A prototype for a generic and opinionated CLI plugin framework.
 	- [ ] semantic version for server/host
 	- [ ] semantic version for plugin
 7. Autopatching
-	- https://github.com/docker/Notary
+	- https://github.com/docker/Notar
 	- https://godoc.org/github.com/inconshreveable/go-update

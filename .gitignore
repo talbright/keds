@@ -32,4 +32,5 @@ vendor
 coverage.html
 *.log
 tmp
-plugin/example/example
+plugin/builtin/example/example
+plugin/builtin/example/main
