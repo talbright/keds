@@ -22,6 +22,7 @@ A prototype for a generic and opinionated CLI plugin framework.
 	- [x] plugin exits when server exits
 3. Misc
 	- [ ] add ci setup for github project
+	- [ ] dependency management (glide or...)
 4. Testing framework
 	- [x] add ginko test package
 	- [ ] tests for client package
