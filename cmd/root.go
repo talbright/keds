@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 
+	"time"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/talbright/keds/server"
@@ -18,10 +20,11 @@ var RootCmd = &cobra.Command{
 	Use:   "keds",
 	Short: "A prototype for a generic and opinionated CLI plugin framework.",
 	Long:  "See http://github.com/talbright/keds/README.md",
+	PreRun: func(cmd *cobra.Command, args []string) {
+		log.Printf("Cobra.PreRun")
+	},
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Printf("config: %v", viper.AllSettings())
-		gRPC := server.NewKedsRPCServer()
-		gRPC.Start()
+		log.Printf("Cobra.Run")
 	},
 }
 
@@ -35,11 +38,31 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(func() { config.InitConfig(cfgFile) })
-
-	// Define persistent flags global for the application.
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.keds.yaml)")
 
-	// Define local flags only run when this action is called directly.
-	// RootCmd.Flags().BoolP("debug", "t", false, "Enable debug mode")
+	// cobra doesn't invoke these callbacks until *after* checking for the help flag, so
+	// we can't use this...
+	// see https://github.com/spf13/cobra/blob/6ed17b5128e8932c9ecd4c3970e8ea5e60a418ac/command.go#L590
+	// cobra.OnInitialize(onInitialize)
+	onInitialize()
+	log.Printf("config: %v", viper.AllSettings())
+}
+
+func onInitialize() {
+	initializeConfig()
+	initializeRuntime()
+}
+
+func initializeConfig() {
+	config.InitConfig(cfgFile)
+}
+
+func initializeRuntime() {
+	go func() {
+		gRPC := server.NewKedsRPCServer()
+		gRPC.Start()
+	}()
+	//TODO this feels hacky...need a more reliable way to determine that the plugins have loaded
+	//and the server has started
+	time.Sleep(3 * time.Second)
 }
