@@ -14,6 +14,9 @@ test: keds
 ginkgo-watch:
 	ginkgo watch -r $(PACKAGES)
 
+test:
+	ginkgo -v -race $(PACKAGES)
+
 gen: gen-grpc gen-grpc-reverse-proxy gen-grpc-swagger
 
 gen-grpc:

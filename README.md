@@ -35,5 +35,5 @@ A prototype for a generic and opinionated CLI plugin framework.
 	- [ ] semantic version for server/host
 	- [ ] semantic version for plugin
 7. Autopatching
-	- https://github.com/docker/Notar
+	- https://github.com/docker/Notary
 	- https://godoc.org/github.com/inconshreveable/go-update

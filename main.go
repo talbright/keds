@@ -5,9 +5,6 @@ import (
 	"github.com/talbright/keds/cmd"
 	// . "github.com/talbright/keds/server"
 	_ "github.com/talbright/keds/utils/config"
-	// "fmt"
-	// "log"
-	// "os"
 )
 
 func main() {

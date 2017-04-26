@@ -18,7 +18,10 @@ const (
 
 var CONFIG_PATH = []string{".", fmt.Sprintf("$HOME/.%s", NAME)}
 
-func init() {
+func InitConfig(cfgFile string) {
+	if cfgFile != "" {
+		viper.SetConfigFile(cfgFile)
+	}
 	viper.SetEnvPrefix(NAME)
 	viper.AutomaticEnv()
 	viper.SetConfigName(NAME)
