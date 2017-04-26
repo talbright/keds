@@ -2,10 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/spf13/cobra"
-	_ "github.com/spf13/viper"
+	"github.com/spf13/viper"
+	"github.com/talbright/keds/server"
 	"github.com/talbright/keds/utils/config"
 )
 
@@ -17,7 +19,9 @@ var RootCmd = &cobra.Command{
 	Short: "A prototype for a generic and opinionated CLI plugin framework.",
 	Long:  "See http://github.com/talbright/keds/README.md",
 	Run: func(cmd *cobra.Command, args []string) {
-		//TODO start server, load plugins, etc
+		log.Printf("config: %v", viper.AllSettings())
+		gRPC := server.NewKedsRPCServer()
+		gRPC.Start()
 	},
 }
 

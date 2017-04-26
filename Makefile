@@ -1,21 +1,18 @@
 PACKAGES=./utils/config ./utils/token ./server
 
-keds: gen
+keds: gen plugins
 	go build -a -o keds main.go
 
-plugins: keds example-plugin
+plugins: example-plugin
 
 example-plugin: plugin/builtin/example/main.go
 	go build -a -o plugin/builtin/example/example plugin/builtin/example/*.go
 
 test: keds
-	go test -p 1 -v -race $(PACKAGES)
+	ginkgo -v -race $(PACKAGES)
 
 ginkgo-watch:
 	ginkgo watch -r $(PACKAGES)
-
-test:
-	ginkgo -v -race $(PACKAGES)
 
 gen: gen-grpc gen-grpc-reverse-proxy gen-grpc-swagger
 
