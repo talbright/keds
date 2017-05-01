@@ -1,4 +1,4 @@
-PACKAGES=./utils/config ./utils/token ./server
+PACKAGES=./utils/config ./utils/token ./utils/system ./server
 
 keds: gen plugins
 	go build -a -o keds main.go
