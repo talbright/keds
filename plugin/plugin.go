@@ -14,6 +14,9 @@ type IPlugin interface {
 	GetEventFilter() string
 	GetSha1() string
 	GetSha1Short() string
+	GetShortDescription() string
+	GetLongDescription() string
+	GetRootCommand() string
 }
 
 type Plugin struct {

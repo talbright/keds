@@ -73,13 +73,15 @@ func (r *PluginRegistry) GetPluginFromContext(ctx context.Context) (IPlugin, err
 }
 
 func (r *PluginRegistry) AddCommandForPlugin(plugin IPlugin) (err error) {
-	if r.rootCmd != nil {
+	if r.rootCmd != nil && plugin.GetRootCommand() != "" {
 		cmd := &cobra.Command{
-			Use:   plugin.GetName(),
-			Short: plugin.GetUsage(),
-			Long:  plugin.GetUsage(),
+			Use:                plugin.GetRootCommand(),
+			Short:              plugin.GetShortDescription(),
+			Long:               plugin.GetLongDescription(),
+			DisableFlagParsing: true,
 			Run: func(cmd *cobra.Command, args []string) {
 				log.Printf("Cobra.run with args %v", args)
+				//TODO invoke plugin here
 			},
 		}
 		r.rootCmd.AddCommand(cmd)

@@ -16,6 +16,8 @@ message PluginDescriptor {
 	string event_filter = 3;
   string version = 4;
   string root_command = 5;
+  string short_description = 6;
+  string long_description = 7;
 }
 
 message PluginEvent {
