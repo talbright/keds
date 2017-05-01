@@ -25,19 +25,21 @@ const (
 
 //RegisterPlugin implements the gRPC interface for keds.proto
 type KedsRPCServer struct {
-	server *grpc.Server
-	events trace.EventLog
-	bus    IEventBusAdapter
-	loader ILoader
+	server   *grpc.Server
+	events   trace.EventLog
+	bus      IEventBusAdapter
+	loader   ILoader
+	registry IPluginRegistry
 }
 
-func NewKedsRPCServer() *KedsRPCServer {
+func NewKedsRPCServer(registry IPluginRegistry) *KedsRPCServer {
 	_, file, line, _ := runtime.Caller(0)
 	return &KedsRPCServer{
-		server: grpc.NewServer(),
-		bus:    NewEventBus(),
-		loader: NewLoader(viper.GetStringSlice("plugin_path")),
-		events: trace.NewEventLog("server.KedsRPCServer", fmt.Sprintf("%s:%d", file, line)),
+		server:   grpc.NewServer(),
+		bus:      NewEventBus(),
+		loader:   NewLoader(viper.GetStringSlice("plugin_path")),
+		events:   trace.NewEventLog("server.KedsRPCServer", fmt.Sprintf("%s:%d", file, line)),
+		registry: registry,
 	}
 }
 
@@ -45,7 +47,7 @@ func NewKedsRPCServer() *KedsRPCServer {
 //plugins must be registered first before invoking other methods
 func (s *KedsRPCServer) RegisterPlugin(ctx context.Context, req *pb.RegisterPluginRequest) (resp *pb.RegisterPluginResponse, err error) {
 	plugin := NewPluginFromRegisterPluginRequest(req)
-	if err = DefaultRegistry().RegisterPlugin(ut.AddTokenToContext(ctx, plugin.GetSha1()), plugin); err != nil {
+	if err = s.registry.RegisterPlugin(ut.AddTokenToContext(ctx, plugin.GetSha1()), plugin); err != nil {
 		s.events.Errorf("failed to register plugin: %v", err)
 	} else {
 		s.events.Printf("registered %s", plugin)
@@ -84,7 +86,7 @@ func (s *KedsRPCServer) EventBus(stream pb.KedsService_EventBusServer) (err erro
 		s.events.Errorf("failed to add stream: %v", err)
 	} else {
 		<-quitc
-		if err = DefaultRegistry().UnRegisterPlugin(stream.Context()); err != nil {
+		if err = s.registry.UnRegisterPlugin(stream.Context()); err != nil {
 			s.events.Errorf("failed to unregister plugin: %v", err)
 		}
 	}
@@ -92,7 +94,7 @@ func (s *KedsRPCServer) EventBus(stream pb.KedsService_EventBusServer) (err erro
 }
 
 func (s *KedsRPCServer) validateToken(ctx context.Context) (err error) {
-	_, err = DefaultRegistry().GetPluginFromContext(ctx)
+	_, err = s.registry.GetPluginFromContext(ctx)
 	return
 }
 

@@ -30,7 +30,9 @@ A prototype for a generic and opinionated CLI plugin framework.
 	- [ ] tests for server package
 	- [x] tests for utils package
 5. Command line
-	- [ ] pass args from server to plugins
+	- [x] setup cobra
+	- [ ] plugin registration creates new cobra command
+	- [ ] plugin invocation from registered cobra command
 6. Versioning
 	- [ ] semantic version for server/host
 	- [ ] semantic version for plugin

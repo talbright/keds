@@ -36,14 +36,11 @@ func InitConfig(cfgFile string) {
 			panic(fmt.Errorf("fatal error config file: %s", err))
 		}
 	}
-	if err := expand(); err != nil {
-		panic(fmt.Errorf("fatal error config file: %s", err))
-	}
+	expand()
 }
 
-func expand() (err error) {
+func expand() {
 	expandPluginPath()
-	return nil
 }
 
 func expandPluginPath() {

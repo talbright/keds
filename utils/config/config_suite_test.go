@@ -3,10 +3,8 @@ package config_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/talbright/keds/utils/config"
+	// . "github.com/talbright/keds/utils/config"
 
-	"path/filepath"
-	"runtime"
 	"testing"
 )
 
@@ -15,6 +13,8 @@ func TestConfig(t *testing.T) {
 	RunSpecs(t, "Config Suite")
 }
 
+//TODO move tests to system package
+/*
 var _ = Describe("config", func() {
 	Describe("AbsPathify", func() {
 		It("should expand the $HOME variable", func() {
@@ -34,3 +34,4 @@ var _ = Describe("config", func() {
 		})
 	})
 })
+*/
