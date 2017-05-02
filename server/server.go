@@ -101,7 +101,7 @@ func (s *KedsRPCServer) validateToken(ctx context.Context) (err error) {
 }
 
 func (s *KedsRPCServer) Start() {
-	// go StartDebugServer()
+	go StartDebugServer()
 	log.Printf("starting plugins")
 	s.loader.Load()
 	log.Printf("starting rpc server on %s", gRPCEndPoint)

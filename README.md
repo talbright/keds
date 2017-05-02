@@ -22,6 +22,7 @@ A prototype for a generic and opinionated CLI plugin framework.
 	- [x] plugin registers itself with the server
 	- [x] plugin exits when server exits
 	- [ ] capture plugin stdout/stderr and log to console
+	- [ ] plugin signal to terminate
 - Misc
 	- [ ] dependency management (glide or ?)
 - Testing

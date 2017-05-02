@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
@@ -68,6 +69,8 @@ func (l *Loader) FindCmdsInPath(path string) (cmds []string) {
 func (l *Loader) BuildCmd(exPath string) (cmd *exec.Cmd) {
 	cmd = exec.Command(exPath)
 	cmd.Dir = path.Dir(exPath)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 	return
 }
 
