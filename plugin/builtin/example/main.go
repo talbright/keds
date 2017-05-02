@@ -55,15 +55,15 @@ func (p *ExamplePlugin) Run() (err error) {
 	if err != nil {
 		log.Fatalf("event bus error: %v", err)
 	}
+	//writing to stdout/stderr works as well
 	p.client.Printf("example plugin connected to console")
 	waitc := make(chan struct{})
-	//receive
+	//event loop
 	go func() {
 		for {
 			var in *pb.PluginEvent
 			if in, err = stream.Recv(); err == nil {
 				log.Printf("received event: %v", in)
-				p.client.Printf("received event: %v", in)
 			} else if err == io.EOF {
 				log.Printf("end of stream")
 				close(waitc)
