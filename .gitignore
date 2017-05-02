@@ -34,3 +34,4 @@ coverage.html
 tmp
 plugin/builtin/example/example
 plugin/builtin/example/main
+.vscode

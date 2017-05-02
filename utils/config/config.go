@@ -2,44 +2,45 @@ package config
 
 import (
 	"github.com/spf13/viper"
+	"github.com/talbright/keds/utils/system"
 
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 	"reflect"
-	"runtime"
 	"strings"
 )
 
 const (
-	NAME = "keds"
+	Name = "keds"
 )
 
-var CONFIG_PATH = []string{".", fmt.Sprintf("$HOME/.%s", NAME)}
+var ConfigPath = []string{".", fmt.Sprintf("$HOME/.%s", Name)}
 
-func init() {
-	viper.SetEnvPrefix(NAME)
-	viper.AutomaticEnv()
-	viper.SetConfigName(NAME)
-	for _, p := range CONFIG_PATH {
-		viper.AddConfigPath(p)
-	}
-	if err := viper.ReadInConfig(); err != nil {
-		if reflect.TypeOf(viper.ConfigFileNotFoundError{}) == reflect.TypeOf(err) {
-			log.Printf("warning: no config file found in path (%s)\n", strings.Join(CONFIG_PATH, ":"))
-		} else {
-			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+func InitConfig(cfgFile string) {
+	if cfgFile != "" {
+		viper.SetConfigFile(cfgFile)
+	} else {
+		viper.SetConfigName(Name)
+		for _, p := range ConfigPath {
+			viper.AddConfigPath(p)
 		}
 	}
-	if err := expand(); err != nil {
-		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+	viper.SetEnvPrefix(Name)
+	viper.AutomaticEnv()
+	if err := viper.ReadInConfig(); err == nil {
+		log.Printf("using config file: %s", viper.ConfigFileUsed())
+	} else {
+		if reflect.TypeOf(viper.ConfigFileNotFoundError{}) == reflect.TypeOf(err) {
+			log.Printf("warning: no config file found in path (%s)\n", strings.Join(ConfigPath, ":"))
+		} else {
+			panic(fmt.Errorf("fatal error config file: %s", err))
+		}
 	}
+	expand()
 }
 
-func expand() (err error) {
+func expand() {
 	expandPluginPath()
-	return nil
 }
 
 func expandPluginPath() {
@@ -47,43 +48,8 @@ func expandPluginPath() {
 	if len(pp) > 0 {
 		expanded := make([]string, 0)
 		for _, v := range pp {
-			expanded = append(expanded, AbsPathify(v))
+			expanded = append(expanded, system.AbsPathify(v))
 		}
 		viper.Set("plugin_path", expanded)
 	}
-}
-
-func AbsPathify(inPath string) string {
-
-	if strings.HasPrefix(inPath, "$HOME") {
-		inPath = UserHomeDir() + inPath[5:]
-	}
-
-	if strings.HasPrefix(inPath, "$") {
-		end := strings.Index(inPath, string(os.PathSeparator))
-		inPath = os.Getenv(inPath[1:end]) + inPath[end:]
-	}
-
-	if filepath.IsAbs(inPath) {
-		return filepath.Clean(inPath)
-	}
-
-	p, err := filepath.Abs(inPath)
-	if err == nil {
-		return filepath.Clean(p)
-	}
-
-	return ""
-}
-
-func UserHomeDir() (home string) {
-	if runtime.GOOS == "windows" {
-		home = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if home == "" {
-			home = os.Getenv("USERPROFILE")
-		}
-	} else {
-		home = os.Getenv("HOME")
-	}
-	return
 }

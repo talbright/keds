@@ -22,6 +22,7 @@ A prototype for a generic and opinionated CLI plugin framework.
 	- [x] plugin exits when server exits
 3. Misc
 	- [ ] add ci setup for github project
+	- [ ] dependency management (glide or...)
 4. Testing framework
 	- [x] add ginko test package
 	- [ ] tests for client package
@@ -29,10 +30,12 @@ A prototype for a generic and opinionated CLI plugin framework.
 	- [ ] tests for server package
 	- [x] tests for utils package
 5. Command line
-	- [ ] pass args from server to plugins
+	- [x] setup cobra
+	- [x] plugin registration creates new cobra command
+	- [x] plugin invocation when registered cobra command is passed in the args
 6. Versioning
 	- [ ] semantic version for server/host
 	- [ ] semantic version for plugin
 7. Autopatching
-	- https://github.com/docker/Notar
+	- https://github.com/docker/Notary
 	- https://godoc.org/github.com/inconshreveable/go-update

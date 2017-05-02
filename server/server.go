@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/viper"
 	pb "github.com/talbright/keds/gen/proto"
-	. "github.com/talbright/keds/plugin"
+	plugin "github.com/talbright/keds/plugin"
 	ut "github.com/talbright/keds/utils/token"
 	"golang.org/x/net/context"
 	"golang.org/x/net/trace"
@@ -25,36 +25,40 @@ const (
 
 //RegisterPlugin implements the gRPC interface for keds.proto
 type KedsRPCServer struct {
-	server *grpc.Server
-	events trace.EventLog
-	bus    IEventBusAdapter
-	loader ILoader
+	server   *grpc.Server
+	events   trace.EventLog
+	bus      plugin.IEventBusAdapter
+	loader   ILoader
+	registry plugin.IRegistry
+	Cobra    *Cobra
 }
 
 func NewKedsRPCServer() *KedsRPCServer {
 	_, file, line, _ := runtime.Caller(0)
 	return &KedsRPCServer{
-		server: grpc.NewServer(),
-		bus:    NewEventBus(),
-		loader: NewLoader(viper.GetStringSlice("plugin_path")),
-		events: trace.NewEventLog("server.KedsRPCServer", fmt.Sprintf("%s:%d", file, line)),
+		server:   grpc.NewServer(),
+		bus:      plugin.NewEventBus(),
+		loader:   NewLoader(viper.GetStringSlice("plugin_path")),
+		events:   trace.NewEventLog("server.KedsRPCServer", fmt.Sprintf("%s:%d", file, line)),
+		registry: plugin.NewRegistry(),
 	}
 }
 
 //RegisterPlugin gRPC interface method implementation
 //plugins must be registered first before invoking other methods
 func (s *KedsRPCServer) RegisterPlugin(ctx context.Context, req *pb.RegisterPluginRequest) (resp *pb.RegisterPluginResponse, err error) {
-	plugin := NewPluginFromRegisterPluginRequest(req)
-	if err = DefaultRegistry().RegisterPlugin(ut.AddTokenToContext(ctx, plugin.GetSha1()), plugin); err != nil {
+	plugin := plugin.NewPluginFromRegisterPluginRequest(req)
+	if err = s.registry.Register(ut.AddTokenToContext(ctx, plugin.GetSha1()), plugin); err != nil {
 		s.events.Errorf("failed to register plugin: %v", err)
 	} else {
 		s.events.Printf("registered %s", plugin)
 		ut.AddTokenToHeader(ctx, plugin.GetSha1())
+		s.Cobra.AddPlugin(ctx, plugin, s.bus)
 	}
 	return &pb.RegisterPluginResponse{}, err
 }
 
-//ConsolWriter gRPC interface method implementation
+//ConsoleWriter gRPC interface method implementation
 //Inbound only stream allows clients to write to the console (STDOUT)
 func (s *KedsRPCServer) ConsoleWriter(stream pb.KedsService_ConsoleWriterServer) error {
 	if err := s.validateToken(stream.Context()); err != nil {
@@ -84,7 +88,7 @@ func (s *KedsRPCServer) EventBus(stream pb.KedsService_EventBusServer) (err erro
 		s.events.Errorf("failed to add stream: %v", err)
 	} else {
 		<-quitc
-		if err = DefaultRegistry().UnRegisterPlugin(stream.Context()); err != nil {
+		if err = s.registry.Unregister(stream.Context()); err != nil {
 			s.events.Errorf("failed to unregister plugin: %v", err)
 		}
 	}
@@ -92,12 +96,12 @@ func (s *KedsRPCServer) EventBus(stream pb.KedsService_EventBusServer) (err erro
 }
 
 func (s *KedsRPCServer) validateToken(ctx context.Context) (err error) {
-	_, err = DefaultRegistry().GetPluginFromContext(ctx)
+	_, err = s.registry.GetFromContext(ctx)
 	return
 }
 
 func (s *KedsRPCServer) Start() {
-	go StartDebugServer()
+	// go StartDebugServer()
 	log.Printf("starting plugins")
 	s.loader.Load()
 	log.Printf("starting rpc server on %s", gRPCEndPoint)

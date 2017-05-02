@@ -1,0 +1,94 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "proto/keds.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protoConsoleWriteRequest": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string"
+        }
+      }
+    },
+    "protoConsoleWriteResponse": {
+      "type": "object"
+    },
+    "protoPluginDescriptor": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "usage": {
+          "type": "string"
+        },
+        "event_filter": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "root_command": {
+          "type": "string"
+        },
+        "short_description": {
+          "type": "string"
+        },
+        "long_description": {
+          "type": "string"
+        }
+      }
+    },
+    "protoPluginEvent": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "protoRegisterPluginRequest": {
+      "type": "object",
+      "properties": {
+        "plugin_descriptor": {
+          "$ref": "#/definitions/protoPluginDescriptor"
+        }
+      }
+    },
+    "protoRegisterPluginResponse": {
+      "type": "object"
+    }
+  }
+}

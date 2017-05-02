@@ -18,11 +18,15 @@ const (
 
 func main() {
 	descriptor := &pb.PluginDescriptor{
-		Name:        "example",
-		Usage:       "<TODO>",
-		EventFilter: "*",
-		Version:     "1",
-		RootCommand: "example",
+		Name:             "example",
+		Usage:            "example",
+		EventFilter:      "*",
+		Version:          "1",
+		RootCommand:      "example",
+		ShortDescription: "This is an example plugin for the keds framework",
+		LongDescription: `This is an exmaple plugin for the keds framework. 
+Keds is a general purpose and opinionated CLI plugin framework. Plugins
+communicate with the server over gRPC`,
 	}
 	client := pc.NewPluginClient(descriptor)
 	if err := client.Connect(address); err != nil {
@@ -59,6 +63,7 @@ func (p *ExamplePlugin) Run() (err error) {
 			var in *pb.PluginEvent
 			if in, err = stream.Recv(); err == nil {
 				log.Printf("received event: %v", in)
+				p.client.Printf("received event: %v", in)
 			} else if err == io.EOF {
 				log.Printf("end of stream")
 				close(waitc)

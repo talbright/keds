@@ -14,6 +14,9 @@ type IPlugin interface {
 	GetEventFilter() string
 	GetSha1() string
 	GetSha1Short() string
+	GetShortDescription() string
+	GetLongDescription() string
+	GetRootCommand() string
 }
 
 type Plugin struct {
@@ -40,5 +43,5 @@ func (p *Plugin) GetSha1Short() string {
 }
 
 func (p Plugin) String() string {
-	return fmt.Sprintf("plugin '%s' v%s (%s)", p.GetName(), p.GetVersion(), p.GetSha1Short())
+	return fmt.Sprintf("'%s' v%s (%s)", p.GetName(), p.GetVersion(), p.GetSha1Short())
 }

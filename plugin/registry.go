@@ -9,32 +9,29 @@ import (
 )
 
 var (
-	registry              = NewPluginRegistry()
 	ErrPluginExists       = fmt.Errorf("plugin already registered")
 	ErrPluginTokenMissing = fmt.Errorf("plugin missing token")
 	ErrPluginMissing      = fmt.Errorf("plugin missing")
 )
 
-func DefaultRegistry() IPluginRegistry { return registry }
-
-type IPluginRegistry interface {
-	RegisterPlugin(ctx context.Context, plugin IPlugin) error
-	UnRegisterPlugin(ctx context.Context) error
-	GetPluginFromContext(ctx context.Context) (IPlugin, error)
+type IRegistry interface {
+	Register(ctx context.Context, plugin IPlugin) error
+	Unregister(ctx context.Context) error
+	GetFromContext(ctx context.Context) (IPlugin, error)
 }
 
-type PluginRegistry struct {
+type Registry struct {
 	pluginsMutex *sync.RWMutex
 	plugins      map[string]IPlugin
 }
 
-func NewPluginRegistry() *PluginRegistry {
-	return &PluginRegistry{plugins: make(map[string]IPlugin), pluginsMutex: &sync.RWMutex{}}
+func NewRegistry() *Registry {
+	return &Registry{plugins: make(map[string]IPlugin), pluginsMutex: &sync.RWMutex{}}
 }
 
-func (r *PluginRegistry) UnRegisterPlugin(ctx context.Context) (err error) {
+func (r *Registry) Unregister(ctx context.Context) (err error) {
 	var plugin IPlugin
-	if plugin, err = r.GetPluginFromContext(ctx); err == nil {
+	if plugin, err = r.GetFromContext(ctx); err == nil {
 		r.pluginsMutex.Lock()
 		defer r.pluginsMutex.Unlock()
 		delete(r.plugins, plugin.GetSha1())
@@ -42,8 +39,8 @@ func (r *PluginRegistry) UnRegisterPlugin(ctx context.Context) (err error) {
 	return
 }
 
-func (r *PluginRegistry) RegisterPlugin(ctx context.Context, plugin IPlugin) (err error) {
-	if _, err = r.GetPluginFromContext(ctx); err == ErrPluginMissing {
+func (r *Registry) Register(ctx context.Context, plugin IPlugin) (err error) {
+	if _, err = r.GetFromContext(ctx); err == ErrPluginMissing {
 		err = nil
 		r.pluginsMutex.Lock()
 		defer r.pluginsMutex.Unlock()
@@ -52,16 +49,33 @@ func (r *PluginRegistry) RegisterPlugin(ctx context.Context, plugin IPlugin) (er
 	return
 }
 
-func (r *PluginRegistry) GetPluginFromContext(ctx context.Context) (IPlugin, error) {
+func (r *Registry) GetFromContext(ctx context.Context) (plugin IPlugin, err error) {
 	r.pluginsMutex.RLock()
 	defer r.pluginsMutex.RUnlock()
 	token := ut.GetTokenFromContext(ctx)
 	if token == "" {
 		return nil, ErrPluginTokenMissing
 	}
-	if plugin, ok := r.plugins[token]; !ok {
-		return nil, ErrPluginMissing
-	} else {
-		return plugin, nil
+	var ok bool
+	if plugin, ok = r.plugins[token]; !ok {
+		err = ErrPluginMissing
 	}
+	return
 }
+
+// func (r *Registry) AddCommandForPlugin(plugin IPlugin) (err error) {
+// 	if r.rootCmd != nil && plugin.GetRootCommand() != "" {
+// 		cmd := &cobra.Command{
+// 			Use:                plugin.GetRootCommand(),
+// 			Short:              plugin.GetShortDescription(),
+// 			Long:               plugin.GetLongDescription(),
+// 			DisableFlagParsing: true,
+// 			Run: func(cmd *cobra.Command, args []string) {
+// 				log.Printf("Cobra.run with args %v", args)
+// 				//TODO invoke plugin here
+// 			},
+// 		}
+// 		r.rootCmd.AddCommand(cmd)
+// 	}
+// 	return
+// }

@@ -1,6 +1,11 @@
 package system
 
-import "os"
+import (
+	"os"
+	"path/filepath"
+	"runtime"
+	"strings"
+)
 
 //Ripped off from https://golang.org/pkg/os/exec
 func IsExecutable(file string) bool {
@@ -19,4 +24,41 @@ func Exists(path string) bool {
 		return true
 	}
 	return false
+}
+
+//Ripped off from github.com/spf13/cobra
+func AbsPathify(inPath string) string {
+
+	if strings.HasPrefix(inPath, "$HOME") {
+		inPath = UserHomeDir() + inPath[5:]
+	}
+
+	if strings.HasPrefix(inPath, "$") {
+		end := strings.Index(inPath, string(os.PathSeparator))
+		inPath = os.Getenv(inPath[1:end]) + inPath[end:]
+	}
+
+	if filepath.IsAbs(inPath) {
+		return filepath.Clean(inPath)
+	}
+
+	p, err := filepath.Abs(inPath)
+	if err == nil {
+		return filepath.Clean(p)
+	}
+
+	return ""
+}
+
+//Ripped off from github.com/spf13/cobra
+func UserHomeDir() (home string) {
+	if runtime.GOOS == "windows" {
+		home = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		if home == "" {
+			home = os.Getenv("USERPROFILE")
+		}
+	} else {
+		home = os.Getenv("HOME")
+	}
+	return
 }
