@@ -94,7 +94,7 @@ func (s *KedsRPCServer) EventBus(stream pb.KedsService_EventBusServer) (err erro
 }
 
 func (s *KedsRPCServer) validateToken(ctx context.Context) (err error) {
-	_, err = s.registry.GetPluginFromContext(ctx)
+	_, err = s.registry.GetFromContext(ctx)
 	return
 }
 
