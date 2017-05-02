@@ -32,7 +32,7 @@ A prototype for a generic and opinionated CLI plugin framework.
 5. Command line
 	- [x] setup cobra
 	- [x] plugin registration creates new cobra command
-	- [ ] plugin invocation when registered cobra command is passed in the args
+	- [x] plugin invocation when registered cobra command is passed in the args
 6. Versioning
 	- [ ] semantic version for server/host
 	- [ ] semantic version for plugin

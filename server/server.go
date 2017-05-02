@@ -30,16 +30,17 @@ type KedsRPCServer struct {
 	bus      plugin.IEventBusAdapter
 	loader   ILoader
 	registry plugin.IRegistry
+	Cobra    *Cobra
 }
 
-func NewKedsRPCServer(registry plugin.IRegistry) *KedsRPCServer {
+func NewKedsRPCServer() *KedsRPCServer {
 	_, file, line, _ := runtime.Caller(0)
 	return &KedsRPCServer{
 		server:   grpc.NewServer(),
 		bus:      plugin.NewEventBus(),
 		loader:   NewLoader(viper.GetStringSlice("plugin_path")),
 		events:   trace.NewEventLog("server.KedsRPCServer", fmt.Sprintf("%s:%d", file, line)),
-		registry: registry,
+		registry: plugin.NewRegistry(),
 	}
 }
 
@@ -52,6 +53,7 @@ func (s *KedsRPCServer) RegisterPlugin(ctx context.Context, req *pb.RegisterPlug
 	} else {
 		s.events.Printf("registered %s", plugin)
 		ut.AddTokenToHeader(ctx, plugin.GetSha1())
+		s.Cobra.AddPlugin(ctx, plugin, s.bus)
 	}
 	return &pb.RegisterPluginResponse{}, err
 }
@@ -99,7 +101,7 @@ func (s *KedsRPCServer) validateToken(ctx context.Context) (err error) {
 }
 
 func (s *KedsRPCServer) Start() {
-	go StartDebugServer()
+	// go StartDebugServer()
 	log.Printf("starting plugins")
 	s.loader.Load()
 	log.Printf("starting rpc server on %s", gRPCEndPoint)

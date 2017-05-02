@@ -1,9 +1,6 @@
 package plugin
 
 import (
-	"log"
-
-	"github.com/spf13/cobra"
 	ut "github.com/talbright/keds/utils/token"
 	"golang.org/x/net/context"
 
@@ -20,17 +17,16 @@ var (
 type IRegistry interface {
 	Register(ctx context.Context, plugin IPlugin) error
 	Unregister(ctx context.Context) error
-	GetPluginFromContext(ctx context.Context) (IPlugin, error)
+	GetFromContext(ctx context.Context) (IPlugin, error)
 }
 
 type Registry struct {
 	pluginsMutex *sync.RWMutex
 	plugins      map[string]IPlugin
-	rootCmd      *cobra.Command
 }
 
-func NewRegistry(rootCmd *cobra.Command) *Registry {
-	return &Registry{plugins: make(map[string]IPlugin), pluginsMutex: &sync.RWMutex{}, rootCmd: rootCmd}
+func NewRegistry() *Registry {
+	return &Registry{plugins: make(map[string]IPlugin), pluginsMutex: &sync.RWMutex{}}
 }
 
 func (r *Registry) Unregister(ctx context.Context) (err error) {
@@ -49,7 +45,6 @@ func (r *Registry) Register(ctx context.Context, plugin IPlugin) (err error) {
 		r.pluginsMutex.Lock()
 		defer r.pluginsMutex.Unlock()
 		r.plugins[ut.GetTokenFromContext(ctx)] = plugin
-		r.AddCommandForPlugin(plugin)
 	}
 	return
 }
@@ -68,19 +63,19 @@ func (r *Registry) GetFromContext(ctx context.Context) (plugin IPlugin, err erro
 	return
 }
 
-func (r *Registry) AddCommandForPlugin(plugin IPlugin) (err error) {
-	if r.rootCmd != nil && plugin.GetRootCommand() != "" {
-		cmd := &cobra.Command{
-			Use:                plugin.GetRootCommand(),
-			Short:              plugin.GetShortDescription(),
-			Long:               plugin.GetLongDescription(),
-			DisableFlagParsing: true,
-			Run: func(cmd *cobra.Command, args []string) {
-				log.Printf("Cobra.run with args %v", args)
-				//TODO invoke plugin here
-			},
-		}
-		r.rootCmd.AddCommand(cmd)
-	}
-	return
-}
+// func (r *Registry) AddCommandForPlugin(plugin IPlugin) (err error) {
+// 	if r.rootCmd != nil && plugin.GetRootCommand() != "" {
+// 		cmd := &cobra.Command{
+// 			Use:                plugin.GetRootCommand(),
+// 			Short:              plugin.GetShortDescription(),
+// 			Long:               plugin.GetLongDescription(),
+// 			DisableFlagParsing: true,
+// 			Run: func(cmd *cobra.Command, args []string) {
+// 				log.Printf("Cobra.run with args %v", args)
+// 				//TODO invoke plugin here
+// 			},
+// 		}
+// 		r.rootCmd.AddCommand(cmd)
+// 	}
+// 	return
+// }

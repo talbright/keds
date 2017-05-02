@@ -62,14 +62,20 @@
         "source": {
           "type": "string"
         },
+        "target": {
+          "type": "string"
+        },
         "data": {
           "type": "object",
           "additionalProperties": {
             "type": "string"
           }
         },
-        "target": {
-          "type": "string"
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

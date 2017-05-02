@@ -63,6 +63,7 @@ func (p *ExamplePlugin) Run() (err error) {
 			var in *pb.PluginEvent
 			if in, err = stream.Recv(); err == nil {
 				log.Printf("received event: %v", in)
+				p.client.Printf("received event: %v", in)
 			} else if err == io.EOF {
 				log.Printf("end of stream")
 				close(waitc)

@@ -9,7 +9,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/talbright/keds/plugin"
 	"github.com/talbright/keds/server"
 	"github.com/talbright/keds/utils/config"
 )
@@ -60,8 +59,8 @@ func initializeConfig() {
 
 func initializeRuntime() {
 	go func() {
-		registry := plugin.NewRegistry(RootCmd)
-		gRPC := server.NewKedsRPCServer(registry)
+		gRPC := server.NewKedsRPCServer()
+		gRPC.Cobra = server.NewCobra(RootCmd)
 		gRPC.Start()
 	}()
 	//TODO this feels hacky...need a more reliable way to determine that the plugins have loaded

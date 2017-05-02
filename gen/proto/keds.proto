@@ -23,8 +23,9 @@ message PluginDescriptor {
 message PluginEvent {
 	string name = 1;
   string source = 2;
-  map<string, string> data = 3;
-  string target = 4;
+  string target = 3;
+  map<string, string> data = 4;
+  repeated string args = 5;
 }
 
 message RegisterPluginRequest {
