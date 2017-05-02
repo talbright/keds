@@ -13,29 +13,35 @@ A prototype for a generic and opinionated CLI plugin framework.
 
 # TODO
 
-1. Configuration management
+- Configuration management
 	- [x] setup for viper
 	- [x] config for plugin path
-2. Plugin lifecycle management
+	- [ ] debug mode flag
+- Plugin lifecycle management
 	- [x] server loads plugins
 	- [x] plugin registers itself with the server
 	- [x] plugin exits when server exits
-3. Misc
+	- [ ] capture plugin stdout/stderr and log to console
+- Misc
+	- [ ] dependency management (glide or ?)
+- Testing
 	- [ ] add ci setup for github project
-	- [ ] dependency management (glide or...)
-4. Testing framework
 	- [x] add ginko test package
 	- [ ] tests for client package
 	- [ ] tests for plugin package
 	- [ ] tests for server package
 	- [x] tests for utils package
-5. Command line
+- Command line
 	- [x] setup cobra
 	- [x] plugin registration creates new cobra command
 	- [x] plugin invocation when registered cobra command is passed in the args
-6. Versioning
+- Versioning
 	- [ ] semantic version for server/host
 	- [ ] semantic version for plugin
-7. Autopatching
+- Autopatching
 	- https://github.com/docker/Notary
 	- https://godoc.org/github.com/inconshreveable/go-update
+- Notifications Plugin
+	- [ ] create bare plugin to listen to events with filtering support
+	- [ ] publish notifications to os/x (if generic go library available to handle os specifics use that)
+	- [ ] publish notifications to slack channel
