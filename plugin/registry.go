@@ -12,32 +12,28 @@ import (
 )
 
 var (
-	registry              = NewPluginRegistry(nil)
 	ErrPluginExists       = fmt.Errorf("plugin already registered")
 	ErrPluginTokenMissing = fmt.Errorf("plugin missing token")
 	ErrPluginMissing      = fmt.Errorf("plugin missing")
 )
 
-//TODO remove
-func DefaultRegistry() IPluginRegistry { return registry }
-
-type IPluginRegistry interface {
-	RegisterPlugin(ctx context.Context, plugin IPlugin) error
-	UnRegisterPlugin(ctx context.Context) error
+type IRegistry interface {
+	Register(ctx context.Context, plugin IPlugin) error
+	Unregister(ctx context.Context) error
 	GetPluginFromContext(ctx context.Context) (IPlugin, error)
 }
 
-type PluginRegistry struct {
+type Registry struct {
 	pluginsMutex *sync.RWMutex
 	plugins      map[string]IPlugin
 	rootCmd      *cobra.Command
 }
 
-func NewPluginRegistry(rootCmd *cobra.Command) *PluginRegistry {
-	return &PluginRegistry{plugins: make(map[string]IPlugin), pluginsMutex: &sync.RWMutex{}, rootCmd: rootCmd}
+func NewRegistry(rootCmd *cobra.Command) *Registry {
+	return &Registry{plugins: make(map[string]IPlugin), pluginsMutex: &sync.RWMutex{}, rootCmd: rootCmd}
 }
 
-func (r *PluginRegistry) UnRegisterPlugin(ctx context.Context) (err error) {
+func (r *Registry) Unregister(ctx context.Context) (err error) {
 	var plugin IPlugin
 	if plugin, err = r.GetPluginFromContext(ctx); err == nil {
 		r.pluginsMutex.Lock()
@@ -47,7 +43,7 @@ func (r *PluginRegistry) UnRegisterPlugin(ctx context.Context) (err error) {
 	return
 }
 
-func (r *PluginRegistry) RegisterPlugin(ctx context.Context, plugin IPlugin) (err error) {
+func (r *Registry) Register(ctx context.Context, plugin IPlugin) (err error) {
 	if _, err = r.GetPluginFromContext(ctx); err == ErrPluginMissing {
 		err = nil
 		r.pluginsMutex.Lock()
@@ -58,7 +54,7 @@ func (r *PluginRegistry) RegisterPlugin(ctx context.Context, plugin IPlugin) (er
 	return
 }
 
-func (r *PluginRegistry) GetPluginFromContext(ctx context.Context) (IPlugin, error) {
+func (r *Registry) GetPluginFromContext(ctx context.Context) (IPlugin, error) {
 	r.pluginsMutex.RLock()
 	defer r.pluginsMutex.RUnlock()
 	token := ut.GetTokenFromContext(ctx)
@@ -72,7 +68,7 @@ func (r *PluginRegistry) GetPluginFromContext(ctx context.Context) (IPlugin, err
 	}
 }
 
-func (r *PluginRegistry) AddCommandForPlugin(plugin IPlugin) (err error) {
+func (r *Registry) AddCommandForPlugin(plugin IPlugin) (err error) {
 	if r.rootCmd != nil && plugin.GetRootCommand() != "" {
 		cmd := &cobra.Command{
 			Use:                plugin.GetRootCommand(),

@@ -60,7 +60,7 @@ func initializeConfig() {
 
 func initializeRuntime() {
 	go func() {
-		registry := plugin.NewPluginRegistry(RootCmd)
+		registry := plugin.NewRegistry(RootCmd)
 		gRPC := server.NewKedsRPCServer(registry)
 		gRPC.Start()
 	}()

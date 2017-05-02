@@ -67,6 +67,9 @@
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "target": {
+          "type": "string"
         }
       }
     },

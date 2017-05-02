@@ -24,6 +24,7 @@ message PluginEvent {
 	string name = 1;
   string source = 2;
   map<string, string> data = 3;
+  string target = 4;
 }
 
 message RegisterPluginRequest {

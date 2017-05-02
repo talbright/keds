@@ -31,8 +31,8 @@ A prototype for a generic and opinionated CLI plugin framework.
 	- [x] tests for utils package
 5. Command line
 	- [x] setup cobra
-	- [ ] plugin registration creates new cobra command
-	- [ ] plugin invocation from registered cobra command
+	- [x] plugin registration creates new cobra command
+	- [ ] plugin invocation when registered cobra command is passed in the args
 6. Versioning
 	- [ ] semantic version for server/host
 	- [ ] semantic version for plugin
