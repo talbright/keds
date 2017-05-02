@@ -1,6 +1,6 @@
 # Keds
 
-A prototype for a generic and opinionated CLI plugin framework.
+A prototype for a generic CLI plugin framework.
 
 # Running
 
