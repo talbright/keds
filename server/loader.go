@@ -37,7 +37,7 @@ func (l *Loader) Load() (err error) {
 	executables := make([]string, 0)
 	for _, p := range l.loadPath {
 		l.events.Printf("searching for plugins in %s", p)
-		executables = append(executables, l.FindCmdsInPath(p)...)
+		executables = append(executables, l.FindPluginsInPath(p)...)
 	}
 	for _, e := range executables {
 		if cmd := l.BuildCmd(e); cmd != nil {
@@ -53,7 +53,7 @@ func (l *Loader) Load() (err error) {
 	return
 }
 
-func (l *Loader) FindCmdsInPath(path string) (cmds []string) {
+func (l *Loader) FindPluginsInPath(path string) (cmds []string) {
 	cmds = make([]string, 0)
 	if files, err := ioutil.ReadDir(path); err == nil {
 		for _, file := range files {
