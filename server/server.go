@@ -21,7 +21,6 @@ import (
 const (
 	gRPCPort     = ":50051"
 	gRPCEndPoint = "localhost:50051"
-	proxyPort    = ":8080"
 )
 
 //RegisterPlugin implements the gRPC interface for keds.proto
@@ -111,7 +110,7 @@ func (s *KedsRPCServer) Start() {
 	log.Printf("starting plugins")
 	s.loader.Load()
 	log.Printf("starting rpc server on %s", gRPCEndPoint)
-	lis, err := net.Listen("tcp", gRPCPort)
+	lis, err := net.Listen("tcp", gRPCEndPoint)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
