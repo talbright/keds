@@ -22,7 +22,7 @@ A prototype for a generic CLI plugin framework.
 	- [x] plugin registers itself with the server
 	- [x] plugin exits when server exits
 	- [x] capture plugin stdout/stderr and log to console
-	- [ ] plugin signal to terminate coordinates exit of server
+	- [x] plugin signal to terminate coordinates exit of server
 - Misc
 	- [ ] dependency management (glide or ?)
 - Testing
@@ -43,7 +43,7 @@ A prototype for a generic CLI plugin framework.
 	- https://github.com/docker/Notary
 	- https://godoc.org/github.com/inconshreveable/go-update
 - Example Plugin
-	- [ ] signal termination event
+	- [x] signal termination event
 	- [ ] integration with cobra
 - Notifications Plugin
 	- [ ] create bare plugin to listen to events with filtering support
