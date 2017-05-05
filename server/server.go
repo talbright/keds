@@ -27,6 +27,7 @@ const (
 //RegisterPlugin implements the gRPC interface for keds.proto
 type KedsRPCServer struct {
 	server   *grpc.Server
+	listener *ServerListener
 	events   trace.EventLog
 	bus      events.IEventBus
 	loader   ILoader
@@ -36,13 +37,16 @@ type KedsRPCServer struct {
 
 func NewKedsRPCServer() *KedsRPCServer {
 	_, file, line, _ := runtime.Caller(0)
-	return &KedsRPCServer{
+	self := &KedsRPCServer{
 		server:   grpc.NewServer(),
 		bus:      events.NewEventBus(),
 		loader:   NewLoader(viper.GetStringSlice("plugin_path")),
 		events:   trace.NewEventLog("server.KedsRPCServer", fmt.Sprintf("%s:%d", file, line)),
 		registry: plugin.NewRegistry(),
 	}
+	self.listener = NewServerListener(self.bus, self)
+	self.bus.AddListener(context.Background(), self.listener)
+	return self
 }
 
 //RegisterPlugin gRPC interface method implementation
