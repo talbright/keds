@@ -8,8 +8,9 @@ import (
 	"runtime"
 
 	"github.com/spf13/viper"
+	"github.com/talbright/keds/events"
 	pb "github.com/talbright/keds/gen/proto"
-	plugin "github.com/talbright/keds/plugin"
+	"github.com/talbright/keds/plugin"
 	ut "github.com/talbright/keds/utils/token"
 	"golang.org/x/net/context"
 	"golang.org/x/net/trace"
@@ -27,7 +28,7 @@ const (
 type KedsRPCServer struct {
 	server   *grpc.Server
 	events   trace.EventLog
-	bus      plugin.IEventBusAdapter
+	bus      events.IEventBus
 	loader   ILoader
 	registry plugin.IRegistry
 	Cobra    *Cobra
@@ -37,7 +38,7 @@ func NewKedsRPCServer() *KedsRPCServer {
 	_, file, line, _ := runtime.Caller(0)
 	return &KedsRPCServer{
 		server:   grpc.NewServer(),
-		bus:      plugin.NewEventBus(),
+		bus:      events.NewEventBus(),
 		loader:   NewLoader(viper.GetStringSlice("plugin_path")),
 		events:   trace.NewEventLog("server.KedsRPCServer", fmt.Sprintf("%s:%d", file, line)),
 		registry: plugin.NewRegistry(),

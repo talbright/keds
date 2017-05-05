@@ -1,4 +1,4 @@
-package plugin
+package events
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 	"golang.org/x/net/trace"
 )
 
-type IEventBusAdapter interface {
+type IEventBus interface {
 	AddStream(ctx context.Context, stream pb.KedsService_EventBusServer) (chan struct{}, error)
 	Publish(ctx context.Context, event *pb.PluginEvent) error
 }
@@ -22,13 +22,13 @@ type IEventBusMember interface {
 }
 
 type EventBusMember struct {
-	EventBus IEventBusAdapter
+	EventBus IEventBus
 	Stream   pb.KedsService_EventBusServer
 	quitc    chan struct{}
 	events   trace.EventLog
 }
 
-func NewEventBusMember(eb IEventBusAdapter, stream pb.KedsService_EventBusServer) *EventBusMember {
+func NewEventBusMember(eb IEventBus, stream pb.KedsService_EventBusServer) *EventBusMember {
 	_, file, line, _ := runtime.Caller(1)
 	return &EventBusMember{
 		EventBus: eb,
