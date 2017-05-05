@@ -85,7 +85,8 @@ func (s *KedsRPCServer) EventBus(stream pb.KedsService_EventBusServer) (err erro
 		return err
 	}
 	var quitc chan struct{}
-	if quitc, err = s.bus.AddStream(stream.Context(), stream); err != nil {
+	listener := NewStreamListener(s.bus, stream)
+	if quitc, err = s.bus.AddListener(stream.Context(), listener); err != nil {
 		s.events.Errorf("failed to add stream: %v", err)
 	} else {
 		<-quitc
