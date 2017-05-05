@@ -16,21 +16,21 @@ type IEventBus interface {
 	Publish(ctx context.Context, event *pb.PluginEvent) error
 }
 
-type IEventBusMember interface {
+type IListener interface {
 	Receive(ctx context.Context, event *pb.PluginEvent) error
 	Listen(ctx context.Context) (chan struct{}, error)
 }
 
-type EventBusMember struct {
+type StreamListener struct {
 	EventBus IEventBus
 	Stream   pb.KedsService_EventBusServer
 	quitc    chan struct{}
 	events   trace.EventLog
 }
 
-func NewEventBusMember(eb IEventBus, stream pb.KedsService_EventBusServer) *EventBusMember {
+func NewEventBusMember(eb IEventBus, stream pb.KedsService_EventBusServer) *StreamListener {
 	_, file, line, _ := runtime.Caller(1)
-	return &EventBusMember{
+	return &StreamListener{
 		EventBus: eb,
 		Stream:   stream,
 		quitc:    make(chan struct{}),
@@ -38,12 +38,12 @@ func NewEventBusMember(eb IEventBus, stream pb.KedsService_EventBusServer) *Even
 	}
 }
 
-func (m *EventBusMember) Receive(ctx context.Context, event *pb.PluginEvent) (err error) {
+func (m *StreamListener) Receive(ctx context.Context, event *pb.PluginEvent) (err error) {
 	m.events.Printf("forwarding event to plugin: %v", event)
 	return m.Stream.Send(event)
 }
 
-func (m *EventBusMember) Listen(ctx context.Context) (quitc chan struct{}, err error) {
+func (m *StreamListener) Listen(ctx context.Context) (quitc chan struct{}, err error) {
 	m.quitc = make(chan struct{})
 	go func() {
 		for {
@@ -65,7 +65,7 @@ func (m *EventBusMember) Listen(ctx context.Context) (quitc chan struct{}, err e
 
 type EventBus struct {
 	memberLock *sync.RWMutex
-	members    []IEventBusMember
+	members    []IListener
 	events     trace.EventLog
 }
 
@@ -73,7 +73,7 @@ func NewEventBus() *EventBus {
 	_, file, line, _ := runtime.Caller(0)
 	return &EventBus{
 		memberLock: &sync.RWMutex{},
-		members:    make([]IEventBusMember, 0),
+		members:    make([]IListener, 0),
 		events:     trace.NewEventLog("plugin.EventBus", fmt.Sprintf("%s:%d", file, line)),
 	}
 }
@@ -97,11 +97,11 @@ func (b *EventBus) Publish(ctx context.Context, event *pb.PluginEvent) (err erro
 	return
 }
 
-func (b *EventBus) appendMember(member IEventBusMember) (err error) {
+func (b *EventBus) appendMember(member IListener) (err error) {
 	b.members = append(b.members, member)
 	return
 }
 
-func (b *EventBus) deleteMember(member IEventBusMember) (err error) {
+func (b *EventBus) deleteMember(member IListener) (err error) {
 	return
 }
