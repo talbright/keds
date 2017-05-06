@@ -8,8 +8,9 @@ import (
 	"runtime"
 
 	"github.com/spf13/viper"
+	"github.com/talbright/keds/events"
 	pb "github.com/talbright/keds/gen/proto"
-	plugin "github.com/talbright/keds/plugin"
+	"github.com/talbright/keds/plugin"
 	ut "github.com/talbright/keds/utils/token"
 	"golang.org/x/net/context"
 	"golang.org/x/net/trace"
@@ -18,16 +19,15 @@ import (
 )
 
 const (
-	gRPCPort     = ":50051"
 	gRPCEndPoint = "localhost:50051"
-	proxyPort    = ":8080"
 )
 
 //RegisterPlugin implements the gRPC interface for keds.proto
 type KedsRPCServer struct {
 	server   *grpc.Server
+	listener *ServerListener
 	events   trace.EventLog
-	bus      plugin.IEventBusAdapter
+	bus      events.IEventBus
 	loader   ILoader
 	registry plugin.IRegistry
 	Cobra    *Cobra
@@ -35,19 +35,22 @@ type KedsRPCServer struct {
 
 func NewKedsRPCServer() *KedsRPCServer {
 	_, file, line, _ := runtime.Caller(0)
-	return &KedsRPCServer{
+	self := &KedsRPCServer{
 		server:   grpc.NewServer(),
-		bus:      plugin.NewEventBus(),
+		bus:      events.NewEventBus(),
 		loader:   NewLoader(viper.GetStringSlice("plugin_path")),
 		events:   trace.NewEventLog("server.KedsRPCServer", fmt.Sprintf("%s:%d", file, line)),
 		registry: plugin.NewRegistry(),
 	}
+	self.listener = NewServerListener(self.bus, self)
+	self.bus.AddListener(context.Background(), self.listener)
+	return self
 }
 
 //RegisterPlugin gRPC interface method implementation
 //plugins must be registered first before invoking other methods
 func (s *KedsRPCServer) RegisterPlugin(ctx context.Context, req *pb.RegisterPluginRequest) (resp *pb.RegisterPluginResponse, err error) {
-	plugin := plugin.NewPluginFromRegisterPluginRequest(req)
+	plugin := plugin.NewPlugin(req.GetPluginDescriptor())
 	if err = s.registry.Register(ut.AddTokenToContext(ctx, plugin.GetSha1()), plugin); err != nil {
 		s.events.Errorf("failed to register plugin: %v", err)
 	} else {
@@ -84,7 +87,8 @@ func (s *KedsRPCServer) EventBus(stream pb.KedsService_EventBusServer) (err erro
 		return err
 	}
 	var quitc chan struct{}
-	if quitc, err = s.bus.AddStream(stream.Context(), stream); err != nil {
+	listener := NewStreamListener(s.bus, stream)
+	if quitc, err = s.bus.AddListener(stream.Context(), listener); err != nil {
 		s.events.Errorf("failed to add stream: %v", err)
 	} else {
 		<-quitc
@@ -105,7 +109,7 @@ func (s *KedsRPCServer) Start() {
 	log.Printf("starting plugins")
 	s.loader.Load()
 	log.Printf("starting rpc server on %s", gRPCEndPoint)
-	lis, err := net.Listen("tcp", gRPCPort)
+	lis, err := net.Listen("tcp", gRPCEndPoint)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

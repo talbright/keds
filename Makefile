@@ -1,4 +1,4 @@
-PACKAGES=./utils/config ./utils/token ./utils/system ./server
+PACKAGES=./utils/config ./utils/token ./utils/system ./server ./events
 
 keds: gen plugins
 	go build -a -o keds main.go
@@ -43,4 +43,3 @@ gen-grpc-swagger: gen-grpc
 		proto/keds.proto
 
 .PHONY: keds
-

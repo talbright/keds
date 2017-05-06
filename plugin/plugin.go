@@ -23,12 +23,8 @@ type Plugin struct {
 	*pb.PluginDescriptor
 }
 
-func NewPlugin() *Plugin {
-	return &Plugin{}
-}
-
-func NewPluginFromRegisterPluginRequest(pr *pb.RegisterPluginRequest) *Plugin {
-	return &Plugin{PluginDescriptor: pr.PluginDescriptor}
+func NewPlugin(descriptor *pb.PluginDescriptor) *Plugin {
+	return &Plugin{PluginDescriptor: descriptor}
 }
 
 func (p *Plugin) GetSha1() string {

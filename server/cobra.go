@@ -8,6 +8,7 @@ import (
 	"golang.org/x/net/trace"
 
 	"github.com/spf13/cobra"
+	"github.com/talbright/keds/events"
 	"github.com/talbright/keds/plugin"
 )
 
@@ -24,7 +25,7 @@ func NewCobra(rootCmd *cobra.Command) *Cobra {
 	}
 }
 
-func (c *Cobra) AddPlugin(ctx context.Context, plug plugin.IPlugin, bus plugin.IEventBusAdapter) {
+func (c *Cobra) AddPlugin(ctx context.Context, plug plugin.IPlugin, bus events.IEventBus) {
 	if plug.GetRootCommand() != "" {
 		cmd := &cobra.Command{
 			Use:                plug.GetRootCommand(),
@@ -33,7 +34,7 @@ func (c *Cobra) AddPlugin(ctx context.Context, plug plugin.IPlugin, bus plugin.I
 			DisableFlagParsing: true,
 			Run: func(cmd *cobra.Command, args []string) {
 				c.events.Printf("cli invocation for plugin %s with args %v", plug, args)
-				event := plugin.CobraCommandInvokedEvent(plug, args)
+				event := events.CreateEventCommandInvoked(plug, args).Proto()
 				bus.Publish(ctx, event)
 			},
 		}

@@ -21,8 +21,8 @@ A prototype for a generic CLI plugin framework.
 	- [x] server loads plugins
 	- [x] plugin registers itself with the server
 	- [x] plugin exits when server exits
-	- [ ] capture plugin stdout/stderr and log to console
-	- [ ] plugin signal to terminate
+	- [x] capture plugin stdout/stderr and log to console
+	- [x] plugin signal to terminate coordinates exit of server
 - Misc
 	- [ ] dependency management (glide or ?)
 - Testing
@@ -42,6 +42,9 @@ A prototype for a generic CLI plugin framework.
 - Autopatching
 	- https://github.com/docker/Notary
 	- https://godoc.org/github.com/inconshreveable/go-update
+- Example Plugin
+	- [x] signal termination event
+	- [ ] integration with cobra
 - Notifications Plugin
 	- [ ] create bare plugin to listen to events with filtering support
 	- [ ] publish notifications to os/x (if generic go library available to handle os specifics use that)

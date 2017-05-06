@@ -64,6 +64,14 @@ func (p *ExamplePlugin) Run() (err error) {
 			var in *pb.PluginEvent
 			if in, err = stream.Recv(); err == nil {
 				log.Printf("received event: %v", in)
+				quitEvent := &pb.PluginEvent{
+					Name:   "server.quit",
+					Source: "example",
+				}
+				log.Printf("sending quit event")
+				if err := stream.Send(quitEvent); err != nil {
+					log.Printf("failed to send event: %s", err)
+				}
 			} else if err == io.EOF {
 				log.Printf("end of stream")
 				close(waitc)

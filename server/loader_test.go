@@ -46,7 +46,7 @@ func createMockPlugins() (rootDir string, dirs []string) {
 }
 
 var _ = Describe("Loader", func() {
-	Describe("FindCmdInPath", func() {
+	Describe("FindPluginsInPath", func() {
 		It("should load and run the executables", func() {
 			rootPluginDir, _ := createMockPlugins()
 			l := NewLoader([]string{rootPluginDir})
@@ -60,11 +60,11 @@ var _ = Describe("Loader", func() {
 			}
 		})
 	})
-	Describe("FindCmdInPath", func() {
+	Describe("FindPluginsInPath", func() {
 		It("should find executables in subdirs of path", func() {
 			rootPluginDir, _ := createMockPlugins()
 			l := NewLoader([]string{rootPluginDir})
-			cmds := l.FindCmdsInPath(rootPluginDir)
+			cmds := l.FindPluginsInPath(rootPluginDir)
 			Expect(cmds).Should(HaveLen(3))
 			Expect(cmds).Should(ContainElement(filepath.Join(rootPluginDir, "plugin0", "plugin0")))
 			Expect(cmds).Should(ContainElement(filepath.Join(rootPluginDir, "plugin1", "plugin1")))
@@ -75,7 +75,7 @@ var _ = Describe("Loader", func() {
 		It("should create the command to execute", func() {
 			rootPluginDir, _ := createMockPlugins()
 			l := NewLoader([]string{rootPluginDir})
-			cmds := l.FindCmdsInPath(rootPluginDir)
+			cmds := l.FindPluginsInPath(rootPluginDir)
 			cmd := l.BuildCmd(cmds[0])
 			Expect(cmd.Path).Should(Equal(cmds[0]))
 			Expect(cmd.Dir).Should(Equal(path.Dir(cmds[0])))
@@ -85,7 +85,7 @@ var _ = Describe("Loader", func() {
 		It("should start the command", func() {
 			rootPluginDir, _ := createMockPlugins()
 			l := NewLoader([]string{rootPluginDir})
-			cmds := l.FindCmdsInPath(rootPluginDir)
+			cmds := l.FindPluginsInPath(rootPluginDir)
 			cmd := l.BuildCmd(cmds[0])
 			Expect(l.StartCmd(cmd)).Should(Succeed())
 			out := cmds[0] + ".out"
