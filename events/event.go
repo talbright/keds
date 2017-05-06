@@ -106,7 +106,17 @@ func WithData(data map[string]string) EventOption {
 }
 
 func WithExitCode(code int) EventOption {
+	return WithKeyPair("exit_code", fmt.Sprintf("%d", code))
+}
+
+func WithKeyPair(key string, val string) EventOption {
 	return func(e *Event) {
-		e.Data["exit_code"] = fmt.Sprintf("%d", code)
+		e.Data[key] = val
+	}
+}
+
+func WithArg(val string) EventOption {
+	return func(e *Event) {
+		e.Args = append(e.Args, val)
 	}
 }

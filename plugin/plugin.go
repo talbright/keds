@@ -41,3 +41,7 @@ func (p *Plugin) GetSha1Short() string {
 func (p Plugin) String() string {
 	return fmt.Sprintf("'%s' v%s (%s)", p.GetName(), p.GetVersion(), p.GetSha1Short())
 }
+
+func (p *Plugin) Proto() *pb.PluginDescriptor {
+	return p.PluginDescriptor
+}

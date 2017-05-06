@@ -30,8 +30,10 @@ func NewStreamListener(eb events.IEventBus, stream pb.KedsService_EventBusServer
 
 func (m *StreamListener) Receive(ctx context.Context, event *pb.PluginEvent) (err error) {
 	m.events.Printf("forwarding event to plugin: %v", event)
-	//TODO don't forward events originating from "me"
-	return m.Stream.Send(event)
+	if event.Source != "example" {
+		err = m.Stream.Send(event)
+	}
+	return
 }
 
 func (m *StreamListener) Listen(ctx context.Context) (quitc chan struct{}, err error) {

@@ -6,6 +6,7 @@ import (
 	"log"
 
 	pc "github.com/talbright/keds/client"
+	"github.com/talbright/keds/events"
 	pb "github.com/talbright/keds/gen/proto"
 	ut "github.com/talbright/keds/utils/token"
 
@@ -61,14 +62,10 @@ func (p *ExamplePlugin) Run() (err error) {
 	//event loop
 	go func() {
 		for {
-			var in *pb.PluginEvent
-			if in, err = stream.Recv(); err == nil {
-				log.Printf("received event: %v", in)
-				quitEvent := &pb.PluginEvent{
-					Name:   "server.quit",
-					Source: "example",
-				}
-				log.Printf("sending quit event")
+			if in, err := stream.Recv(); err == nil {
+				log.Printf("plugin received event: %v", in)
+				quitEvent := events.CreateEventServerQuit(nil, 0).Proto()
+				quitEvent.Source = "example"
 				if err := stream.Send(quitEvent); err != nil {
 					log.Printf("failed to send event: %s", err)
 				}

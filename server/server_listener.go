@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strconv"
 
 	"github.com/talbright/keds/events"
 	pb "github.com/talbright/keds/gen/proto"
@@ -47,7 +48,11 @@ func (m *ServerListener) Listen(ctx context.Context) (quitc chan struct{}, err e
 }
 
 func (m *ServerListener) handleEvent(event *pb.PluginEvent) {
-	if event.Name == "server.quit" {
-		os.Exit(0)
+	if event.Name == "keds.exit" {
+		exitCode := 0
+		if strCode, ok := event.Data["exit_code"]; ok {
+			exitCode, _ = strconv.Atoi(strCode)
+		}
+		os.Exit(exitCode)
 	}
 }
