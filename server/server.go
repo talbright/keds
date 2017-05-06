@@ -19,7 +19,6 @@ import (
 )
 
 const (
-	gRPCPort     = ":50051"
 	gRPCEndPoint = "localhost:50051"
 )
 
@@ -51,7 +50,7 @@ func NewKedsRPCServer() *KedsRPCServer {
 //RegisterPlugin gRPC interface method implementation
 //plugins must be registered first before invoking other methods
 func (s *KedsRPCServer) RegisterPlugin(ctx context.Context, req *pb.RegisterPluginRequest) (resp *pb.RegisterPluginResponse, err error) {
-	plugin := plugin.NewPluginFromRegisterPluginRequest(req)
+	plugin := plugin.NewPlugin(req.GetPluginDescriptor())
 	if err = s.registry.Register(ut.AddTokenToContext(ctx, plugin.GetSha1()), plugin); err != nil {
 		s.events.Errorf("failed to register plugin: %v", err)
 	} else {

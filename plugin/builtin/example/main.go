@@ -67,7 +67,6 @@ func (p *ExamplePlugin) Run() (err error) {
 				quitEvent := &pb.PluginEvent{
 					Name:   "server.quit",
 					Source: "example",
-					Target: "server",
 				}
 				log.Printf("sending quit event")
 				if err := stream.Send(quitEvent); err != nil {

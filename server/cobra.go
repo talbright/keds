@@ -34,7 +34,7 @@ func (c *Cobra) AddPlugin(ctx context.Context, plug plugin.IPlugin, bus events.I
 			DisableFlagParsing: true,
 			Run: func(cmd *cobra.Command, args []string) {
 				c.events.Printf("cli invocation for plugin %s with args %v", plug, args)
-				event := events.CobraCommandInvokedEvent(plug, args)
+				event := events.CreateEventCommandInvoked(plug, args).Proto()
 				bus.Publish(ctx, event)
 			},
 		}
