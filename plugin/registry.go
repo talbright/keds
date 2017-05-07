@@ -15,22 +15,22 @@ var (
 )
 
 type IRegistry interface {
-	Register(ctx context.Context, plugin IPlugin) error
+	Register(ctx context.Context, plugin *Plugin) error
 	Unregister(ctx context.Context) error
-	GetFromContext(ctx context.Context) (IPlugin, error)
+	GetFromContext(ctx context.Context) (*Plugin, error)
 }
 
 type Registry struct {
 	pluginsMutex *sync.RWMutex
-	plugins      map[string]IPlugin
+	plugins      map[string]*Plugin
 }
 
 func NewRegistry() *Registry {
-	return &Registry{plugins: make(map[string]IPlugin), pluginsMutex: &sync.RWMutex{}}
+	return &Registry{plugins: make(map[string]*Plugin), pluginsMutex: &sync.RWMutex{}}
 }
 
 func (r *Registry) Unregister(ctx context.Context) (err error) {
-	var plugin IPlugin
+	var plugin *Plugin
 	if plugin, err = r.GetFromContext(ctx); err == nil {
 		r.pluginsMutex.Lock()
 		defer r.pluginsMutex.Unlock()
@@ -39,7 +39,7 @@ func (r *Registry) Unregister(ctx context.Context) (err error) {
 	return
 }
 
-func (r *Registry) Register(ctx context.Context, plugin IPlugin) (err error) {
+func (r *Registry) Register(ctx context.Context, plugin *Plugin) (err error) {
 	if _, err = r.GetFromContext(ctx); err == ErrPluginMissing {
 		err = nil
 		r.pluginsMutex.Lock()
@@ -49,7 +49,7 @@ func (r *Registry) Register(ctx context.Context, plugin IPlugin) (err error) {
 	return
 }
 
-func (r *Registry) GetFromContext(ctx context.Context) (plugin IPlugin, err error) {
+func (r *Registry) GetFromContext(ctx context.Context) (plugin *Plugin, err error) {
 	r.pluginsMutex.RLock()
 	defer r.pluginsMutex.RUnlock()
 	token := ut.GetTokenFromContext(ctx)
@@ -62,20 +62,3 @@ func (r *Registry) GetFromContext(ctx context.Context) (plugin IPlugin, err erro
 	}
 	return
 }
-
-// func (r *Registry) AddCommandForPlugin(plugin IPlugin) (err error) {
-// 	if r.rootCmd != nil && plugin.GetRootCommand() != "" {
-// 		cmd := &cobra.Command{
-// 			Use:                plugin.GetRootCommand(),
-// 			Short:              plugin.GetShortDescription(),
-// 			Long:               plugin.GetLongDescription(),
-// 			DisableFlagParsing: true,
-// 			Run: func(cmd *cobra.Command, args []string) {
-// 				log.Printf("Cobra.run with args %v", args)
-// 				//TODO invoke plugin here
-// 			},
-// 		}
-// 		r.rootCmd.AddCommand(cmd)
-// 	}
-// 	return
-// }
