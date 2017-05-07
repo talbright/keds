@@ -17,6 +17,7 @@ A prototype for a generic CLI plugin framework.
 	- [ ] fix inconsistent use of interfaces, concrete, and proto gen (plugins and events)
 	- [ ] better use of "addressing" for event source/target...maybe use URIs?
 	- [ ] prevent event source from sending back to itself (loop)
+	- [ ] take advantage of cancelations via Context
 - Configuration management
 	- [x] setup for viper
 	- [x] config for plugin path

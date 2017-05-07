@@ -10,7 +10,7 @@ import (
 )
 
 var _ = Describe("Event", func() {
-	var plug plugin.IPlugin
+	var plug *plugin.Plugin
 	var descriptor *pb.PluginDescriptor
 	BeforeEach(func() {
 		descriptor = &pb.PluginDescriptor{

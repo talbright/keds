@@ -7,18 +7,6 @@ import (
 	"fmt"
 )
 
-type IPlugin interface {
-	GetName() string
-	GetVersion() string
-	GetUsage() string
-	GetEventFilter() string
-	GetSha1() string
-	GetSha1Short() string
-	GetShortDescription() string
-	GetLongDescription() string
-	GetRootCommand() string
-}
-
 type Plugin struct {
 	*pb.PluginDescriptor
 }

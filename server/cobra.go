@@ -25,7 +25,7 @@ func NewCobra(rootCmd *cobra.Command) *Cobra {
 	}
 }
 
-func (c *Cobra) AddPlugin(ctx context.Context, plug plugin.IPlugin, bus events.IEventBus) {
+func (c *Cobra) AddPlugin(ctx context.Context, plug *plugin.Plugin, bus events.IEventBus) {
 	if plug.GetRootCommand() != "" {
 		cmd := &cobra.Command{
 			Use:                plug.GetRootCommand(),

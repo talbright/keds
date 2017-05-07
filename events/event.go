@@ -12,22 +12,14 @@ const (
 	PluginNamespace   = "plugin"
 )
 
-type IEvent interface {
-	GetName() string
-	GetSource() string
-	GetTarget() string
-	GetData() map[string]string
-	GetArgs() []string
-}
-
 type Event struct {
 	*pb.PluginEvent
-	SourcePlugin plugin.IPlugin
+	SourcePlugin *plugin.Plugin
 }
 
 type EventOption func(e *Event)
 
-func NewEvent(event *pb.PluginEvent, src plugin.IPlugin) *Event {
+func NewEvent(event *pb.PluginEvent, src *plugin.Plugin) *Event {
 	e := &Event{SourcePlugin: src}
 	if event != nil {
 		e.PluginEvent = event
@@ -61,15 +53,15 @@ func (e *Event) Proto() *pb.PluginEvent {
 	return e.PluginEvent
 }
 
-func CreateEventServerQuit(src plugin.IPlugin, exitCode int) (event *Event) {
+func CreateEventServerQuit(src *plugin.Plugin, exitCode int) (event *Event) {
 	return NewEventWithOptions(WithExitCode(exitCode), WithName("keds.exit"), WithSourcePlugin(src))
 }
 
-func CreateEventCommandInvoked(target plugin.IPlugin, args []string) (event *Event) {
+func CreateEventCommandInvoked(target *plugin.Plugin, args []string) (event *Event) {
 	return NewEventWithOptions(WithArgs(args), WithName("keds.command_invoked"), WithSource("keds"), WithTarget(target.GetName()))
 }
 
-func WithSourcePlugin(plug plugin.IPlugin) EventOption {
+func WithSourcePlugin(plug *plugin.Plugin) EventOption {
 	return func(e *Event) {
 		e.SourcePlugin = plug
 	}
