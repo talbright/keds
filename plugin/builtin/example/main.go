@@ -5,17 +5,31 @@ import (
 	"io"
 	"log"
 
+	"fmt"
+
+	"github.com/spf13/cobra"
 	pc "github.com/talbright/keds/client"
 	"github.com/talbright/keds/events"
 	pb "github.com/talbright/keds/gen/proto"
 	ut "github.com/talbright/keds/utils/token"
-
 	"golang.org/x/net/context"
 )
 
 const (
 	address = "localhost:50051"
 )
+
+var rootCmd *cobra.Command
+var flagQuit bool
+
+func init() {
+	rootCmd = &cobra.Command{
+		Use:   "example",
+		Short: "An example plugin for the keds framework.",
+		Long:  "See http://github.com/talbright/keds/README.md",
+	}
+	rootCmd.Flags().BoolVarP(&flagQuit, "quit", "q", false, "immediately exit")
+}
 
 func main() {
 	descriptor := &pb.PluginDescriptor{
@@ -50,6 +64,14 @@ func NewExamplePlugin(descriptor *pb.PluginDescriptor, client *pc.PluginClient) 
 	}
 }
 
+func (p *ExamplePlugin) Quit(stream pb.KedsService_EventBusClient, code int) {
+	quitEvent := events.CreateEventServerQuit(nil, code).Proto()
+	quitEvent.Source = "example"
+	if err := stream.Send(quitEvent); err != nil {
+		log.Printf("failed to send event: %s", err)
+	}
+}
+
 func (p *ExamplePlugin) Run() (err error) {
 	ctx := ut.AddTokenToContext(context.Background(), p.client.Token)
 	stream, err := p.client.EventBus(ctx)
@@ -64,10 +86,18 @@ func (p *ExamplePlugin) Run() (err error) {
 		for {
 			if in, err := stream.Recv(); err == nil {
 				log.Printf("plugin received event: %v", in)
-				quitEvent := events.CreateEventServerQuit(nil, 0).Proto()
-				quitEvent.Source = "example"
-				if err := stream.Send(quitEvent); err != nil {
-					log.Printf("failed to send event: %s", err)
+				if in.GetName() == "keds.command_invoked" {
+					rootCmd.SetArgs(in.GetArgs())
+					rootCmd.Run = func(cmd *cobra.Command, args []string) {
+						log.Printf("Cobra.Run")
+						if flagQuit {
+							p.Quit(stream, 0)
+						}
+					}
+					if err := rootCmd.Execute(); err != nil {
+						fmt.Println("error for rootCmd")
+						p.Quit(stream, 2)
+					}
 				}
 			} else if err == io.EOF {
 				log.Printf("end of stream")
