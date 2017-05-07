@@ -14,10 +14,11 @@ A prototype for a generic CLI plugin framework.
 # TODO
 
 - Fixes
-	- [ ] fix inconsistent use of interfaces, concrete, and proto gen (plugins and events)
+	- [x] fix inconsistent use of interfaces, concrete, and proto gen (plugins and events)
 	- [ ] better use of "addressing" for event source/target...maybe use URIs?
 	- [ ] prevent event source from sending back to itself (loop)
 	- [ ] take advantage of cancelations via Context
+	- [ ] clean-up and create a "Base" plugin type that's easier to extend
 - Configuration management
 	- [x] setup for viper
 	- [x] config for plugin path
@@ -49,7 +50,7 @@ A prototype for a generic CLI plugin framework.
 	- https://godoc.org/github.com/inconshreveable/go-update
 - Example Plugin
 	- [x] signal termination event
-	- [ ] integration with cobra
+	- [x] integration with cobra
 - Notifications Plugin
 	- [ ] create bare plugin to listen to events with filtering support
 	- [ ] publish notifications to os/x (if generic go library available to handle os specifics use that)
