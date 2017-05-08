@@ -12,7 +12,10 @@ var (
 	ErrPluginExists       = fmt.Errorf("plugin already registered")
 	ErrPluginTokenMissing = fmt.Errorf("plugin missing token")
 	ErrPluginMissing      = fmt.Errorf("plugin missing")
+	registry              = NewRegistry()
 )
+
+func DefaultRegistry() IRegistry { return registry }
 
 type IRegistry interface {
 	Register(ctx context.Context, plugin *Plugin) error

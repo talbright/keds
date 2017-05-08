@@ -6,6 +6,6 @@ import (
 
 func main() {
 	cmd.Execute()
-	// cmd.RootCmd.DebugFlags()
+	cmd.RootCmd.DebugFlags()
 	select {}
 }

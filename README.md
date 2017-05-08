@@ -15,8 +15,8 @@ A prototype for a generic CLI plugin framework.
 
 - Fixes
 	- [x] fix inconsistent use of interfaces, concrete, and proto gen (plugins and events)
-	- [ ] better use of "addressing" for event source/target...maybe use URIs?
-	- [ ] prevent event source from sending back to itself (loop)
+	- [x] better use of "addressing" for event source/target...maybe use URIs?
+	- [x] prevent event source from sending back to itself (loop)
 	- [ ] take advantage of cancelations via Context
 	- [ ] clean-up and create a "Base" plugin type that's easier to extend
 - Configuration management

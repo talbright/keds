@@ -66,7 +66,6 @@ func NewExamplePlugin(descriptor *pb.PluginDescriptor, client *pc.PluginClient) 
 
 func (p *ExamplePlugin) Quit(stream pb.KedsService_EventBusClient, code int) {
 	quitEvent := events.CreateEventServerQuit(nil, code).Proto()
-	quitEvent.Source = "example"
 	if err := stream.Send(quitEvent); err != nil {
 		log.Printf("failed to send event: %s", err)
 	}
