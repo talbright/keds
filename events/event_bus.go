@@ -46,9 +46,11 @@ func (b *EventBus) AddListener(ctx context.Context, listener IListener) (quitc c
 func (b *EventBus) Publish(ctx context.Context, event *pb.PluginEvent) (err error) {
 	b.memberLock.RLock()
 	defer b.memberLock.RUnlock()
-	b.events.Printf("publishing event '%s' to %d listeners", event.Name, len(b.listeners))
+	b.events.Printf("publishing event %s to %d listeners", event.Name, len(b.listeners))
 	for _, member := range b.listeners {
-		member.Receive(ctx, event)
+		if err := member.Receive(ctx, event); err != nil {
+			b.events.Errorf("error publishing event %s to %s", event, member)
+		}
 	}
 	return
 }

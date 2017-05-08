@@ -33,7 +33,9 @@ func NewServerListener(eb events.IEventBus, server *KedsRPCServer) *ServerListen
 
 func (m *ServerListener) Receive(ctx context.Context, event *pb.PluginEvent) (err error) {
 	m.events.Printf("received event: %v", event)
-	m.eventc <- event
+	if event.GetSource() != "keds" {
+		m.eventc <- event
+	}
 	return
 }
 
@@ -55,4 +57,8 @@ func (m *ServerListener) handleEvent(event *pb.PluginEvent) {
 		}
 		os.Exit(exitCode)
 	}
+}
+
+func (m ServerListener) String() string {
+	return fmt.Sprintf("server.ServerListener (internal)")
 }
