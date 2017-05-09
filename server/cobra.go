@@ -8,6 +8,7 @@ import (
 	"golang.org/x/net/trace"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/talbright/keds/events"
 	"github.com/talbright/keds/plugin"
 )
@@ -34,8 +35,9 @@ func (c *Cobra) AddPlugin(ctx context.Context, plug *plugin.Plugin, bus events.I
 			DisableFlagParsing: true,
 			Run: func(cmd *cobra.Command, args []string) {
 				c.events.Printf("cli invocation for plugin %s with args %v", plug, args)
-				event := events.CreateEventCommandInvoked(plug, args).Proto()
-				bus.Publish(ctx, event)
+				event := events.CreateEventCommandInvoked(plug, args)
+				event.ApplyOptions(events.WithKeyPair("config_file_path", viper.ConfigFileUsed()))
+				bus.Publish(ctx, event.Proto())
 			},
 		}
 		c.rootCmd.AddCommand(cmd)
