@@ -1,11 +1,9 @@
 package main
 
 import (
-	_ "fmt"
+	"fmt"
 	"io"
 	"log"
-
-	"fmt"
 
 	"github.com/spf13/cobra"
 	pc "github.com/talbright/keds/client"

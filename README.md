@@ -20,7 +20,7 @@ A prototype for a generic CLI plugin framework.
 	- [ ] take advantage of cancelations via Context
 	- [ ] clean-up and create a "Base" plugin type that's easier to extend
 	- [ ] rename event/event_bus to event/bus (go conventions)
-	- [ ] send config file location to plugins so they can read it (env is already inherited)
+	- [x] send config file location to plugins so they can read it (env is already inherited)
 - Configuration management
 	- [x] setup for viper
 	- [x] config for plugin path
