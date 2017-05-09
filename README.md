@@ -19,6 +19,8 @@ A prototype for a generic CLI plugin framework.
 	- [x] prevent event source from sending back to itself (loop)
 	- [ ] take advantage of cancelations via Context
 	- [ ] clean-up and create a "Base" plugin type that's easier to extend
+	- [ ] rename event/event_bus to event/bus (go conventions)
+	- [ ] send config file location to plugins so they can read it (env is already inherited)
 - Configuration management
 	- [x] setup for viper
 	- [x] config for plugin path
@@ -55,3 +57,4 @@ A prototype for a generic CLI plugin framework.
 	- [ ] create bare plugin to listen to events with filtering support
 	- [ ] publish notifications to os/x (if generic go library available to handle os specifics use that)
 	- [ ] publish notifications to slack channel
+	see https://github.com/deckarep/gosx-notifier, https://github.com/0xAX/notificator
