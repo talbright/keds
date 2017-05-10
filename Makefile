@@ -1,12 +1,15 @@
-PACKAGES=./utils/config ./utils/token ./utils/system ./server ./events
+PACKAGES=./utils/config ./utils/token ./utils/system ./server ./events ./client
 
 keds: gen plugins
 	go build -a -o keds main.go
 
-plugins: example-plugin
+plugins: example-plugin notifications-plugin
 
 example-plugin: plugin/builtin/example/main.go
 	go build -a -o plugin/builtin/example/example plugin/builtin/example/*.go
+
+notifications-plugin: plugin/builtin/notifications/main.go
+	go build -a -o plugin/builtin/notifications/notifications plugin/builtin/notifications/*.go
 
 test: keds
 	ginkgo -v -race $(PACKAGES)
