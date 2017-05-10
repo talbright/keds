@@ -18,7 +18,7 @@ A prototype for a generic CLI plugin framework.
 	- [x] better use of "addressing" for event source/target...maybe use URIs?
 	- [x] prevent event source from sending back to itself (loop)
 	- [ ] take advantage of cancelations via Context
-	- [ ] clean-up and create a "Base" plugin type that's easier to extend
+	- [x] clean-up and create a "Base" plugin type that's easier to extend
 	- [ ] rename event/event_bus to event/bus (go conventions)
 	- [x] send config file location to plugins so they can read it (env is already inherited)
 - Configuration management

@@ -22,6 +22,10 @@ const (
 	gRPCEndPoint = "localhost:50051"
 )
 
+func EndPoint() string {
+	return gRPCEndPoint
+}
+
 //RegisterPlugin implements the gRPC interface for keds.proto
 type KedsRPCServer struct {
 	server   *grpc.Server

@@ -1,0 +1,7 @@
+name: example
+usage: example
+event_filter: "*"
+version: 1
+root_command: example
+short_description: An example plugin for the keds framework.
+long_description: See http://github.com/talbright/keds/README.md
