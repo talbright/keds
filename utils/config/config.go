@@ -6,6 +6,7 @@ import (
 
 	"fmt"
 	"log"
+	"os"
 	"reflect"
 	"strings"
 )
@@ -15,6 +16,14 @@ const (
 )
 
 var ConfigPath = []string{".", fmt.Sprintf("$HOME/.%s", Name)}
+
+func GetConfigPathKey() string {
+	return fmt.Sprintf("%s_CONFIG_FILE_PATH", strings.ToUpper(Name))
+}
+
+func GetConfigPath() string {
+	return os.Getenv(GetConfigPathKey())
+}
 
 func InitConfig(cfgFile string) {
 	if cfgFile != "" {
@@ -29,6 +38,9 @@ func InitConfig(cfgFile string) {
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err == nil {
 		log.Printf("using config file: %s", viper.ConfigFileUsed())
+		key := GetConfigPathKey()
+		val := viper.ConfigFileUsed()
+		os.Setenv(key, val)
 	} else {
 		if reflect.TypeOf(viper.ConfigFileNotFoundError{}) == reflect.TypeOf(err) {
 			log.Printf("warning: no config file found in path (%s)\n", strings.Join(ConfigPath, ":"))
