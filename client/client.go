@@ -1,3 +1,7 @@
+/*
+Package client provides the primary set of types and interfaces needed to implement
+a plugin compatible with keds.
+*/
 package client
 
 import (
@@ -23,8 +27,10 @@ ClientCallbackHandler implementations should process the main logic of a plugin.
 type ClientCallbackHandler interface {
 	OnCommandInvoked(client *Client, event *pb.PluginEvent, cmd *cobra.Command, args []string)
 	OnBusEvent(client *Client, event *pb.PluginEvent)
-	OnInitCommand(client *Client, cmd *cobra.Command)
+	OnInitRootCommand(client *Client, cmd *cobra.Command)
 	OnQuit(client *Client)
+	OnRegistered(client *Client)
+	OnConnected(client *Client)
 }
 
 /*
@@ -38,9 +44,16 @@ type Client struct {
 	Token              string
 	ConsoleWriteStream pb.KedsService_ConsoleWriterClient
 	EventBusStream     pb.KedsService_EventBusClient
-	RootCommand        *cobra.Command
-	PluginConfig       *viper.Viper
-	ServerConfig       *viper.Viper
+	//RootCommand is the root command for your plugins CLI. The RootCommand is only
+	//initialized if your plugin descriptor has defined a root command name.
+	RootCommand *cobra.Command
+	//PluginConfig should define all the properties to fulfill the PluginDescriptor. Plugin
+	//users should not put custom settings here, though you can store defaults.
+	PluginConfig *viper.Viper
+	//ServerConfig is the complete configuration for the plugin host and all other plugins.
+	//Users should configure any plugin specific behavior here, not in PluginConfig.
+	ServerConfig *viper.Viper
+	//KedsServiceClient is the gRPC implementation based on the proto file.
 	pb.KedsServiceClient
 }
 
@@ -88,7 +101,7 @@ func (c *Client) initRootCommand() {
 			Short: c.PluginDescriptor.GetShortDescription(),
 			Long:  c.PluginDescriptor.GetLongDescription(),
 		}
-		c.CallbackHandler.OnInitCommand(c, c.RootCommand)
+		c.CallbackHandler.OnInitRootCommand(c, c.RootCommand)
 	}
 }
 
@@ -96,9 +109,11 @@ func (c *Client) Run() (err error) {
 	if err = c.connect(server.EndPoint()); err != nil {
 		return
 	}
+	c.CallbackHandler.OnConnected(c)
 	if err = c.register(); err != nil {
 		return
 	}
+	c.CallbackHandler.OnRegistered(c)
 	if c.EventBusStream, err = c.EventBus(c.contextWithToken()); err != nil {
 		return
 	}

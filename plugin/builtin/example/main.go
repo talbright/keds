@@ -23,9 +23,17 @@ func (e *ExampleHandler) OnBusEvent(cli *client.Client, event *pb.PluginEvent) {
 	log.Println("ExampleHandler.OnBusEvent")
 }
 
-func (e *ExampleHandler) OnInitCommand(cli *client.Client, cmd *cobra.Command) {
+func (e *ExampleHandler) OnInitRootCommand(cli *client.Client, cmd *cobra.Command) {
 	log.Println("ExampleHandler.OnInitCommand")
 	cmd.Flags().BoolVarP(&e.flagQuit, "quit", "q", false, "immediately exit")
+}
+
+func (e *ExampleHandler) OnConnected(cli *client.Client) {
+	log.Println("ExampleHandler.OnConnected")
+}
+
+func (e *ExampleHandler) OnRegistered(cli *client.Client) {
+	log.Println("ExampleHandler.OnRegistered")
 }
 
 func (e *ExampleHandler) OnQuit(cli *client.Client) {
