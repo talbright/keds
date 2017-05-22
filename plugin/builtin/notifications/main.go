@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-	notifications := &Notifications{}
-	plugin, err := client.NewClient(notifications)
+	notificationsHandler := NewNotificationsHandler()
+	plugin, err := client.NewClient(notificationsHandler)
 	if err != nil {
 		log.Fatalf("client error: %v", err)
 	}
