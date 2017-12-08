@@ -1,4 +1,9 @@
-PACKAGES=./utils/config ./utils/token ./utils/system ./server ./events ./client
+PACKAGES=./utils/config ./utils/token ./utils/system ./server ./events ./client ./cmd
+VENDOR=$(shell pwd)/vendor
+GOTOOLS := \
+		github.com/onsi/ginkgo/ginkgo \
+		github.com/golang/protobuf/protoc-gen-go \
+		github.com/golang/protobuf/proto
 
 keds: gen plugins
 	go build -a -o keds main.go
@@ -22,8 +27,7 @@ gen: gen-grpc gen-grpc-reverse-proxy gen-grpc-swagger
 gen-grpc:
 	cd gen && protoc \
 		-I proto \
-		-I $(GOPATH)/src \
-		-I $(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+		-I $(VENDOR)/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--go_out=Mgoogle/api/annotations.proto=github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api,plugins=grpc:proto \
 		proto/keds.proto
 
@@ -31,8 +35,7 @@ gen-grpc-reverse-proxy: gen-grpc
 	cd gen && protoc \
 		-I /usr/local/include \
 		-I. \
-		-I $(GOPATH)/src \
-		-I $(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+		-I $(VENDOR)/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--grpc-gateway_out=logtostderr=true:. \
 		proto/keds.proto
 
@@ -40,9 +43,11 @@ gen-grpc-swagger: gen-grpc
 	cd gen && protoc \
 		-I /usr/local/include \
 		-I. \
-		-I $(GOPATH)/src \
-		-I $(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+		-I $(VENDOR)/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--swagger_out=logtostderr=true:. \
 		proto/keds.proto
 
-.PHONY: keds
+go-tools:
+	go get -u -v $(GOTOOLS)
+
+.PHONY: keds go-tools
