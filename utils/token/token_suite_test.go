@@ -20,7 +20,7 @@ var _ = Describe("token", func() {
 		It("should add the token to the context metadata", func() {
 			val := "abc"
 			ctx := AddTokenToContext(context.Background(), val)
-			md, _ := metadata.FromContext(ctx)
+			md, _ := metadata.FromOutgoingContext(ctx)
 			toke, _ := md[TOKEN_KEY]
 			Expect(toke[0]).Should(Equal(val))
 		})

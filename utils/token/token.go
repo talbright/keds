@@ -9,14 +9,14 @@ import (
 const TOKEN_KEY = "token"
 
 func GetTokenFromContext(ctx context.Context) (token string) {
-	if md, ok := metadata.FromContext(ctx); ok {
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
 		token = GetTokenFromMetadata(md)
 	}
 	return
 }
 
 func AddTokenToContext(ctx context.Context, token string) context.Context {
-	return metadata.NewContext(ctx, CreateMetadataWithToken(token))
+	return metadata.NewOutgoingContext(ctx, CreateMetadataWithToken(token))
 }
 
 func CreateMetadataWithToken(token string) metadata.MD {

@@ -18,7 +18,7 @@ var cfgFile string
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "keds",
-	Short: "A prototype for a generic and opinionated CLI plugin framework.",
+	Short: "A prototype for a generic CLI plugin framework based on gRPC.",
 	Long:  "See http://github.com/talbright/keds/README.md",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		log.Printf("Cobra.PreRun")
