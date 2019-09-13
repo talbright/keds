@@ -1,0 +1,6 @@
+name: notifications
+usage: notifications
+event_filter: "*"
+version: 1
+short_description: Provides a generic notification system for other plugins.
+long_description: See http://github.com/talbright/keds/README.md

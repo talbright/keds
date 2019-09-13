@@ -34,4 +34,6 @@ coverage.html
 tmp
 plugin/builtin/example/example
 plugin/builtin/example/main
+plugin/builtin/notifications/notifications
+plugin/builtin/notifications/main
 .vscode

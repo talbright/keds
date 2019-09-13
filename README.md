@@ -2,6 +2,13 @@
 
 A prototype for a generic CLI plugin framework.
 
+# Developer Setup
+
+		$ brew install dep
+		$ brew install protobuf
+		$ make go-tools
+		$ make test
+
 # Running
 
 		$ go run main.go

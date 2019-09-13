@@ -5,15 +5,15 @@ import "google/api/annotations.proto";
 package proto;
 
 service KedsService {
-	rpc RegisterPlugin (RegisterPluginRequest) returns (RegisterPluginResponse) {}
-	rpc ConsoleWriter (stream ConsoleWriteRequest) returns (ConsoleWriteResponse) {}
+  rpc RegisterPlugin (RegisterPluginRequest) returns (RegisterPluginResponse) {}
+  rpc ConsoleWriter (stream ConsoleWriteRequest) returns (ConsoleWriteResponse) {}
   rpc EventBus(stream PluginEvent) returns (stream PluginEvent) {}
 }
 
 message PluginDescriptor {
-	string name = 1;
+  string name = 1;
   string usage = 2;
-	string event_filter = 3;
+  string event_filter = 3;
   string version = 4;
   string root_command = 5;
   string short_description = 6;
@@ -21,7 +21,7 @@ message PluginDescriptor {
 }
 
 message PluginEvent {
-	string name = 1;
+  string name = 1;
   string source = 2;
   string target = 3;
   map<string, string> data = 4;
@@ -36,7 +36,7 @@ message RegisterPluginResponse {
 }
 
 message ConsoleWriteRequest {
-	string data = 1;
+  string data = 1;
 }
 
 message ConsoleWriteResponse { }

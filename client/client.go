@@ -1,3 +1,5 @@
+// Package client provides the primary set of types and interfaces needed to implement
+// a plugin compatible with keds.
 package client
 
 import (
@@ -10,61 +12,70 @@ import (
 	"github.com/talbright/keds/events"
 	pb "github.com/talbright/keds/gen/proto"
 	"github.com/talbright/keds/server"
+	"github.com/talbright/keds/utils/config"
 	ut "github.com/talbright/keds/utils/token"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
-/*
-ClientCallbackHandler implementations should process the main logic of a plugin.
-*/
-type ClientCallbackHandler interface {
-	OnCommandInvoked(client *Client, event *pb.PluginEvent, cmd *cobra.Command, args []string)
-	OnBusEvent(client *Client, event *pb.PluginEvent)
-	OnInitCommand(client *Client, cmd *cobra.Command)
-	OnQuit(client *Client)
-}
-
-/*
-Client is the primary type that should be used to create plugins. Plugins
-communicate with the plugin host over gRPC.
-*/
+// Client is the primary type that should be used to create plugins. Plugins
+// communicate with the plugin host over gRPC, and use the CallbackHandler to
+// receive plugin lifecycle events.
 type Client struct {
-	CallbackHandler    ClientCallbackHandler
+	callbackHandler    CallbackHandler
 	Conn               *grpc.ClientConn
 	PluginDescriptor   *pb.PluginDescriptor
 	Token              string
 	ConsoleWriteStream pb.KedsService_ConsoleWriterClient
 	EventBusStream     pb.KedsService_EventBusClient
-	RootCommand        *cobra.Command
-	pluginConfig       *viper.Viper
-	hostConfig         *viper.Viper
+	//RootCommand is the root command for your plugins CLI. The RootCommand is only
+	//initialized if your plugin descriptor has defined a root command name.
+	RootCommand *cobra.Command
+	//PluginConfig should define all the properties to fulfill the PluginDescriptor. Plugin
+	//users should not put custom settings here, though you can store defaults.
+	PluginConfig *viper.Viper
+	//ServerConfig is the complete configuration for the plugin host and all other plugins.
+	//Users should configure any plugin specific behavior here, not in PluginConfig.
+	ServerConfig *viper.Viper
+	//KedsServiceClient is the gRPC implementation based on the proto file.
 	pb.KedsServiceClient
 }
 
-func NewClient(handler ClientCallbackHandler) (client *Client, err error) {
-	client = &Client{CallbackHandler: handler, PluginDescriptor: &pb.PluginDescriptor{}}
+func NewClient(handler CallbackHandler) (client *Client, err error) {
+	client = &Client{callbackHandler: handler, PluginDescriptor: &pb.PluginDescriptor{}}
 	if err = client.loadPluginConfig(); err != nil {
+		return
+	}
+	if err = client.loadServerConfig(); err != nil {
 		return
 	}
 	client.initRootCommand()
 	return
 }
 
+func (c *Client) loadServerConfig() (err error) {
+	c.ServerConfig = viper.New()
+	if configFilePath := config.GetConfigPath(); configFilePath != "" {
+		c.ServerConfig.SetConfigFile(configFilePath)
+		err = c.ServerConfig.ReadInConfig()
+	}
+	return
+}
+
 func (c *Client) loadPluginConfig() (err error) {
-	c.pluginConfig = viper.New()
-	c.pluginConfig.SetConfigFile("plugin.yaml")
-	if err = c.pluginConfig.ReadInConfig(); err != nil {
+	c.PluginConfig = viper.New()
+	c.PluginConfig.SetConfigFile("plugin.yaml")
+	if err = c.PluginConfig.ReadInConfig(); err != nil {
 		return
 	}
-	c.PluginDescriptor.ShortDescription = c.pluginConfig.GetString("short_description")
-	c.PluginDescriptor.LongDescription = c.pluginConfig.GetString("long_description")
-	c.PluginDescriptor.RootCommand = c.pluginConfig.GetString("root_command")
-	c.PluginDescriptor.Name = c.pluginConfig.GetString("name")
-	c.PluginDescriptor.Usage = c.pluginConfig.GetString("usage")
-	c.PluginDescriptor.Version = c.pluginConfig.GetString("version")
-	c.PluginDescriptor.EventFilter = c.pluginConfig.GetString("event_filter")
+	c.PluginDescriptor.ShortDescription = c.PluginConfig.GetString("short_description")
+	c.PluginDescriptor.LongDescription = c.PluginConfig.GetString("long_description")
+	c.PluginDescriptor.RootCommand = c.PluginConfig.GetString("root_command")
+	c.PluginDescriptor.Name = c.PluginConfig.GetString("name")
+	c.PluginDescriptor.Usage = c.PluginConfig.GetString("usage")
+	c.PluginDescriptor.Version = c.PluginConfig.GetString("version")
+	c.PluginDescriptor.EventFilter = c.PluginConfig.GetString("event_filter")
 	return
 }
 
@@ -75,7 +86,7 @@ func (c *Client) initRootCommand() {
 			Short: c.PluginDescriptor.GetShortDescription(),
 			Long:  c.PluginDescriptor.GetLongDescription(),
 		}
-		c.CallbackHandler.OnInitCommand(c, c.RootCommand)
+		c.callbackHandler.OnInitRootCommand(c, c.RootCommand)
 	}
 }
 
@@ -83,9 +94,11 @@ func (c *Client) Run() (err error) {
 	if err = c.connect(server.EndPoint()); err != nil {
 		return
 	}
+	c.callbackHandler.OnConnected(c)
 	if err = c.register(); err != nil {
 		return
 	}
+	c.callbackHandler.OnRegistered(c)
 	if c.EventBusStream, err = c.EventBus(c.contextWithToken()); err != nil {
 		return
 	}
@@ -122,7 +135,7 @@ func (c *Client) Quit(code int) {
 	if err := c.EventBusStream.Send(quitEvent); err != nil {
 		log.Printf("failed to send event: %s", err)
 	}
-	c.CallbackHandler.OnQuit(c)
+	c.callbackHandler.OnQuit(c)
 	c.close()
 }
 
@@ -179,11 +192,11 @@ func (c *Client) loop() (err error) {
 }
 
 func (c *Client) onBusEvent(in *pb.PluginEvent) {
-	c.CallbackHandler.OnBusEvent(c, in)
+	c.callbackHandler.OnBusEvent(c, in)
 	if in.GetName() == "keds.command_invoked" && c.RootCommand != nil {
 		c.RootCommand.SetArgs(in.GetArgs())
 		c.RootCommand.Run = func(cmd *cobra.Command, args []string) {
-			c.CallbackHandler.OnCommandInvoked(c, in, cmd, args)
+			c.callbackHandler.OnCommandInvoked(c, in, cmd, args)
 		}
 		if err := c.RootCommand.Execute(); err != nil {
 			log.Printf("error executing command: %s", err)
